@@ -9,27 +9,27 @@ export default function AboutPage() {
   return (
     <div className="flex flex-col">
       {/* Hero Section */}
-      <section className="relative">
+      <section className="relative h-[50vh] w-full overflow-hidden">
+        <Image
+          src="/placeholder.svg?height=600&width=1600"
+          alt="Barbershop interior"
+          fill
+          className="object-cover"
+          priority
+        />
         <div className="absolute inset-0 bg-black/60" />
-        <div className="relative mx-auto flex max-w-[85rem] flex-col items-center px-4 py-20 text-center sm:px-6 md:py-24 lg:px-8">
-          <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl">About BarberStyle</h1>
-          <p className="mt-4 max-w-2xl text-lg text-white/80 md:text-xl">
-            Premium barbershop with a tradition of excellence since 2010
-          </p>
-        </div>
-        <div className="relative h-[40vh] w-full">
-          <Image
-            src="/placeholder.svg?height=600&width=1600"
-            alt="Barbershop interior"
-            fill
-            className="object-cover"
-            priority
-          />
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="mx-auto max-w-6xl px-4 text-center">
+            <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl">About BarberStyle</h1>
+            <p className="mx-auto mt-4 max-w-2xl text-lg text-white/80 md:text-xl">
+              Premium barbershop with a tradition of excellence since 2010
+            </p>
+          </div>
         </div>
       </section>
 
       {/* Our Story */}
-      <section className="container py-16 md:py-24">
+      <section className="mx-auto max-w-6xl px-4 py-16 md:py-24">
         <div className="mx-auto max-w-3xl">
           <div className="mb-12 text-center">
             <h2 className="text-3xl font-bold tracking-tight md:text-4xl">Our Story</h2>
@@ -71,7 +71,7 @@ export default function AboutPage() {
 
       {/* Our Values */}
       <section className="bg-muted py-16 md:py-24">
-        <div className="container">
+        <div className="mx-auto max-w-6xl px-4">
           <div className="mb-12 text-center">
             <h2 className="text-3xl font-bold tracking-tight md:text-4xl">Our Values</h2>
             <p className="mt-4 text-lg text-muted-foreground">The principles that guide everything we do</p>

@@ -9,36 +9,36 @@ export default function Home() {
   return (
     <div className="flex flex-col">
       {/* Hero Section */}
-      <section className="relative">
+      <section className="relative h-[80vh] w-full overflow-hidden">
+        <Image
+          src="/placeholder.svg?height=1080&width=1920"
+          alt="Barbershop interior"
+          fill
+          className="object-cover"
+          priority
+        />
         <div className="absolute inset-0 bg-black/60" />
-        <div className="relative mx-auto flex max-w-[85rem] flex-col items-center px-4 py-20 text-center sm:px-6 md:py-32 lg:px-8">
-          <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl lg:text-6xl">
-            Premium Barbershop Experience
-          </h1>
-          <p className="mt-4 max-w-2xl text-lg text-white/80 md:text-xl">
-            Expert haircuts, beard trims, and grooming services for the modern gentleman. Book your appointment today.
-          </p>
-          <div className="mt-8 flex flex-col gap-4 sm:flex-row">
-            <Link href="/booking">
-              <Button size="lg" className="gap-2">
-                Book Appointment <ArrowRight className="h-4 w-4" />
-              </Button>
-            </Link>
-            <Link href="/services">
-              <Button variant="outline" size="lg" className="bg-white/10 text-white hover:bg-white/20">
-                View Services
-              </Button>
-            </Link>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="mx-auto max-w-6xl px-4 text-center">
+            <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl lg:text-6xl">
+              Premium Barbershop Experience
+            </h1>
+            <p className="mx-auto mt-4 max-w-2xl text-lg text-white/80 md:text-xl">
+              Expert haircuts, beard trims, and grooming services for the modern gentleman. Book your appointment today.
+            </p>
+            <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
+              <Link href="/booking">
+                <Button size="lg" className="gap-2">
+                  Book Appointment <ArrowRight className="h-4 w-4" />
+                </Button>
+              </Link>
+              <Link href="/services">
+                <Button variant="outline" size="lg" className="bg-white/10 text-white hover:bg-white/20">
+                  View Services
+                </Button>
+              </Link>
+            </div>
           </div>
-        </div>
-        <div className="relative h-[60vh] w-full">
-          <Image
-            src="/placeholder.svg?height=800&width=1600"
-            alt="Barbershop interior"
-            fill
-            className="object-cover"
-            priority
-          />
         </div>
       </section>
 

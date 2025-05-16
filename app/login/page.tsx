@@ -1,30 +1,73 @@
 "use client"
 
-import type React from "react"
-
 import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Scissors } from "lucide-react"
-
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { toast } from "@/components/ui/use-toast"
 
 export default function LoginPage() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [error, setError] = useState("")
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setIsLoading(true)
+    setError("")
 
-    // Simulate login process
-    setTimeout(() => {
+    try {
+      const response = await fetch("https://be-collins.vercel.app/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.message || "Login failed")
+      }
+
+      if (data.success) {
+        // Simpan token dan user data ke localStorage
+        localStorage.setItem("token", data.data.token)
+        localStorage.setItem("userId", data.data.user.id)
+        localStorage.setItem("userData", JSON.stringify(data.data.user))
+        
+        // Beri jeda sebelum redirect untuk memastikan data tersimpan
+        setTimeout(() => {
+          // Redirect berdasarkan role_id
+          switch (data.data.user.role_id) {
+            case 1:
+              window.location.href = "/admin-dashboard" // Gunakan full page reload
+              break
+            case 2:
+              window.location.href = "/barber-dashboard"
+              break
+            case 3:
+              window.location.href = "/dashboard"
+              break
+            default:
+              window.location.href = "/dashboard"
+          }
+        }, 100)
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An unknown error occurred")
       setIsLoading(false)
-      router.push("/dashboard")
-    }, 1500)
+    }
   }
 
   return (
@@ -38,10 +81,22 @@ export default function LoginPage() {
           <CardDescription>Enter your email and password to login to your account</CardDescription>
         </CardHeader>
         <CardContent>
+          {error && (
+            <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md text-sm">
+              {error}
+            </div>
+          )}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" placeholder="name@example.com" required />
+              <Input 
+                id="email" 
+                type="email" 
+                placeholder="name@example.com" 
+                required 
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
             </div>
             <div className="space-y-2">
               <div className="flex items-center justify-between">
@@ -50,7 +105,13 @@ export default function LoginPage() {
                   Forgot password?
                 </Link>
               </div>
-              <Input id="password" type="password" required />
+              <Input 
+                id="password" 
+                type="password" 
+                required 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
             </div>
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? "Logging in..." : "Login"}

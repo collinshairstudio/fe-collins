@@ -1,9 +1,10 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { CalendarIcon, Check, ChevronLeft, ChevronRight, Clock } from "lucide-react"
+import { toast } from "@/components/ui/use-toast"
 
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
@@ -13,56 +14,44 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Separator } from "@/components/ui/separator"
 import { cn } from "@/lib/utils"
 
-// Sample data
-const barbers = [
-  {
-    id: 1,
-    name: "Alex Johnson",
-    image: "/placeholder.svg?height=100&width=100",
-    specialties: ["Classic Cuts", "Hot Towel Shaves"],
-  },
-  {
-    id: 2,
-    name: "Sam Rodriguez",
-    image: "/placeholder.svg?height=100&width=100",
-    specialties: ["Modern Styles", "Fades"],
-  },
-  {
-    id: 3,
-    name: "Jordan Smith",
-    image: "/placeholder.svg?height=100&width=100",
-    specialties: ["Beard Styling", "Hair Design"],
-  },
-]
+type Barber = {
+  id: number
+  name: string
+  created_at: string
+}
 
-const services = [
-  { id: 1, name: "Classic Haircut", duration: "30 min", price: "$25" },
-  { id: 2, name: "Beard Trim", duration: "15 min", price: "$15" },
-  { id: 3, name: "Hot Towel Shave", duration: "45 min", price: "$30" },
-  { id: 4, name: "Haircut & Beard Trim", duration: "45 min", price: "$35" },
-  { id: 5, name: "Deluxe Package", duration: "60 min", price: "$50" },
-]
+type Service = {
+  id: number
+  name: string
+  price: number
+  created_at: string
+}
 
-const timeSlots = [
-  "9:00 AM",
-  "9:30 AM",
-  "10:00 AM",
-  "10:30 AM",
-  "11:00 AM",
-  "11:30 AM",
-  "1:00 PM",
-  "1:30 PM",
-  "2:00 PM",
-  "2:30 PM",
-  "3:00 PM",
-  "3:30 PM",
-  "4:00 PM",
-  "4:30 PM",
-  "5:00 PM",
-  "5:30 PM",
-  "6:00 PM",
-  "6:30 PM",
-]
+type TimeSlot = {
+  time: string
+  display: string
+}
+
+type FinalBookingDetails = {
+  booking: {
+    id: number
+    user_id: string
+    capster_id: number
+    schedule: string
+    created_at: string
+    status: string
+    service_id: number
+  }
+  barber: {
+    id: number
+    name: string
+  }
+  service: {
+    id: number
+    name: string
+    price?: number
+  }
+}
 
 type BookingStep = "barber" | "service" | "datetime" | "confirmation"
 
@@ -74,27 +63,180 @@ export default function BookingPage() {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined)
   const [selectedTime, setSelectedTime] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [barbers, setBarbers] = useState<Barber[]>([])
+  const [services, setServices] = useState<Service[]>([])
+  const [availableSlots, setAvailableSlots] = useState<TimeSlot[]>([])
+  const [isFetchingSlots, setIsFetchingSlots] = useState(false)
 
-  const handleNext = () => {
-    if (step === "barber") setStep("service")
-    else if (step === "service") setStep("datetime")
-    else if (step === "datetime") setStep("confirmation")
+  useEffect(() => {
+    const fetchInitialData = async () => {
+      try {
+        const [barbersRes, servicesRes] = await Promise.all([
+          fetch("https://be-collins.vercel.app/api/bookings/capsters"),
+          fetch("https://be-collins.vercel.app/api/bookings/services")
+        ])
+
+        const [barbersData, servicesData] = await Promise.all([
+          barbersRes.json(),
+          servicesRes.json()
+        ])
+
+        if (barbersData.success) setBarbers(barbersData.data)
+        if (servicesData.success) setServices(servicesData.data)
+      } catch (error) {
+        console.error("Failed to fetch initial data:", error)
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to load service data"
+        })
+      }
+    }
+
+    fetchInitialData()
+  }, [])
+
+  const getUTCDate = (date: Date) => {
+    return new Date(
+      Date.UTC(
+        date.getFullYear(),
+        date.getMonth(),
+        date.getDate(),
+        0, 0, 0, 0
+      )
+    )
+  }
+
+  useEffect(() => {
+    if (selectedBarber && selectedDate) {
+      const fetchAvailableSlots = async () => {
+        setIsFetchingSlots(true)
+        try {
+          const utcDate = getUTCDate(selectedDate)
+          const year = utcDate.getUTCFullYear()
+          const month = String(utcDate.getUTCMonth() + 1).padStart(2, '0')
+          const day = String(utcDate.getUTCDate()).padStart(2, '0')
+          const dateStr = `${year}-${month}-${day}`
+          
+          const response = await fetch(
+            `https://be-collins.vercel.app/api/bookings/available-schedules?capster_id=${selectedBarber}&date=${dateStr}`
+          )
+          
+          const data = await response.json()
+          
+          if (data.success) {
+            const formattedSlots = data.data.available_slots.map((slot: {time: string}) => ({
+              time: slot.time,
+              display: formatTimeForDisplay(slot.time)
+            }))
+            setAvailableSlots(formattedSlots)
+          }
+        } catch (error) {
+          console.error("Failed to fetch available slots:", error)
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: "Failed to load available time slots"
+          })
+        } finally {
+          setIsFetchingSlots(false)
+        }
+      }
+
+      fetchAvailableSlots()
+    } else {
+      setAvailableSlots([])
+    }
+  }, [selectedBarber, selectedDate])
+
+  const formatTimeForDisplay = (timeStr: string) => {
+    const [hours, minutes] = timeStr.split(':')
+    const hourNum = parseInt(hours)
+    const period = hourNum >= 12 ? 'PM' : 'AM'
+    const displayHour = hourNum % 12 || 12
+    return `${displayHour}:${minutes} ${period}`
+  }
+
+  const handleConfirm = async () => {
+  if (!selectedBarber || !selectedService || !selectedDate || !selectedTime) return;
+
+  setIsLoading(true);
+
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      throw new Error('No authentication token found');
+    }
+    
+    const utcDate = getUTCDate(selectedDate);
+    const year = utcDate.getUTCFullYear();
+    const month = String(utcDate.getUTCMonth() + 1).padStart(2, '0');
+    const day = String(utcDate.getUTCDate()).padStart(2, '0');
+    const dateStr = `${year}-${month}-${day}`;
+    
+    const [timePart] = selectedTime.split(' ');
+    const [hours, minutes] = timePart.split(':');
+    let hourNum = parseInt(hours);
+    const period = selectedTime.includes('PM') ? 'PM' : 'AM';
+    
+    if (period === 'PM' && hourNum < 12) {
+      hourNum += 12;
+    } else if (period === 'AM' && hourNum === 12) {
+      hourNum = 0;
+    }
+    
+    const timeStr = `${String(hourNum).padStart(2, '0')}:${minutes}`;
+
+    const response = await fetch("https://be-collins.vercel.app/api/bookings", {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        capster_id: selectedBarber,
+        service_id: selectedService,
+        date: dateStr,
+        time: timeStr
+      })
+    });
+
+    const data = await response.json();
+    
+    if (data.success) {
+  const bookingId = data.data.data.booking.id; // Sesuaikan dengan response API
+  router.push(`/booking/success?booking_id=${bookingId}`);
+}
+  } catch (error) {
+    console.error("Booking error:", error);
+    toast({
+      variant: "destructive",
+      title: "Booking Failed",
+      description: error instanceof Error ? error.message : "Failed to book appointment"
+    });
+  } finally {
+    setIsLoading(false);
+  }
+};
+
+const handleNext = () => {
+    if (step === "barber" && selectedBarber) {
+      setStep("service")
+    } else if (step === "service" && selectedService) {
+      setStep("datetime")
+    } else if (step === "datetime" && selectedDate && selectedTime) {
+      setStep("confirmation")
+    }
   }
 
   const handleBack = () => {
-    if (step === "service") setStep("barber")
-    else if (step === "datetime") setStep("service")
-    else if (step === "confirmation") setStep("datetime")
-  }
-
-  const handleConfirm = () => {
-    setIsLoading(true)
-
-    // Simulate booking process
-    setTimeout(() => {
-      setIsLoading(false)
-      router.push("/booking/success")
-    }, 1500)
+    if (step === "service") {
+      setStep("barber")
+    } else if (step === "datetime") {
+      setStep("service")
+    } else if (step === "confirmation") {
+      setStep("datetime")
+    }
   }
 
   const isNextDisabled = () => {
@@ -102,6 +244,16 @@ export default function BookingPage() {
     if (step === "service" && !selectedService) return true
     if (step === "datetime" && (!selectedDate || !selectedTime)) return true
     return false
+  }
+
+  const formatDateForDisplay = (date: Date | undefined) => {
+    if (!date) return ""
+    return date.toLocaleDateString("en-US", {
+      weekday: "long",
+      month: "long",
+      day: "numeric",
+      timeZone: "UTC"
+    })
   }
 
   return (
@@ -205,13 +357,12 @@ export default function BookingPage() {
                         className="flex cursor-pointer items-start gap-4 rounded-lg border p-4 hover:bg-muted peer-data-[state=checked]:border-primary"
                       >
                         <img
-                          src={barber.image || "/placeholder.svg"}
+                          src="/placeholder.svg"
                           alt={barber.name}
                           className="h-16 w-16 rounded-full object-cover"
                         />
                         <div>
                           <h3 className="font-medium">{barber.name}</h3>
-                          <p className="text-sm text-muted-foreground">Specialties: {barber.specialties.join(", ")}</p>
                         </div>
                       </label>
                     </div>
@@ -239,9 +390,8 @@ export default function BookingPage() {
                       >
                         <div>
                           <h3 className="font-medium">{service.name}</h3>
-                          <p className="text-sm text-muted-foreground">Duration: {service.duration}</p>
                         </div>
-                        <span className="font-medium">{service.price}</span>
+                        <span className="font-medium">Rp{service.price.toLocaleString()}</span>
                       </label>
                     </div>
                   ))}
@@ -295,19 +445,31 @@ export default function BookingPage() {
 
                 <div>
                   <h3 className="mb-2 font-medium">Select Time</h3>
-                  <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
-                    {timeSlots.map((time) => (
-                      <Button
-                        key={time}
-                        variant={selectedTime === time ? "default" : "outline"}
-                        className="flex items-center gap-1"
-                        onClick={() => setSelectedTime(time)}
-                      >
-                        <Clock className="h-3 w-3" />
-                        <span>{time}</span>
-                      </Button>
-                    ))}
-                  </div>
+                  {isFetchingSlots ? (
+                    <div className="flex justify-center py-4">
+                      <p>Loading available time slots...</p>
+                    </div>
+                  ) : availableSlots.length > 0 ? (
+                    <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+                      {availableSlots.map((slot) => (
+                        <Button
+                          key={slot.time}
+                          variant={selectedTime === slot.display ? "default" : "outline"}
+                          className="flex items-center gap-1"
+                          onClick={() => setSelectedTime(slot.display)}
+                        >
+                          <Clock className="h-3 w-3" />
+                          <span>{slot.display}</span>
+                        </Button>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="rounded-md border p-4 text-center text-muted-foreground">
+                      {selectedDate
+                        ? "No available time slots for this date"
+                        : "Please select a date to see available time slots"}
+                    </div>
+                  )}
                 </div>
               </div>
             )}
@@ -341,7 +503,9 @@ export default function BookingPage() {
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Price:</span>
-                      <span className="font-medium">{services.find((s) => s.id === selectedService)?.price}</span>
+                      <span className="font-medium">
+                        Rp{services.find((s) => s.id === selectedService)?.price.toLocaleString()}
+                      </span>
                     </div>
                   </div>
                 </div>

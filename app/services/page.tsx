@@ -79,27 +79,27 @@ export default function ServicesPage() {
   return (
     <div className="flex flex-col">
       {/* Hero Section */}
-      <section className="relative">
+      <section className="relative h-[50vh] w-full overflow-hidden">
+        <Image
+          src="/placeholder.svg?height=600&width=1600"
+          alt="Barbershop services"
+          fill
+          className="object-cover"
+          priority
+        />
         <div className="absolute inset-0 bg-black/60" />
-        <div className="relative mx-auto flex max-w-[85rem] flex-col items-center px-4 py-20 text-center sm:px-6 md:py-24 lg:px-8">
-          <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl">Our Services</h1>
-          <p className="mt-4 max-w-2xl text-lg text-white/80 md:text-xl">
-            Premium barbering services tailored to your style
-          </p>
-        </div>
-        <div className="relative h-[40vh] w-full">
-          <Image
-            src="/placeholder.svg?height=600&width=1600"
-            alt="Barbershop services"
-            fill
-            className="object-cover"
-            priority
-          />
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="mx-auto max-w-6xl px-4 text-center">
+            <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl">Our Services</h1>
+            <p className="mx-auto mt-4 max-w-2xl text-lg text-white/80 md:text-xl">
+              Premium barbering services tailored to your style
+            </p>
+          </div>
         </div>
       </section>
 
       {/* Services List */}
-      <section className="container py-16 md:py-24">
+      <section className="mx-auto max-w-6xl px-4 py-16 md:py-24">
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {services.map((service) => (
             <Card key={service.id} className="overflow-hidden">
@@ -136,7 +136,7 @@ export default function ServicesPage() {
 
       {/* CTA Section */}
       <section className="bg-primary text-primary-foreground">
-        <div className="container py-16 md:py-24">
+        <div className="mx-auto max-w-6xl px-4 py-16 md:py-24">
           <div className="mx-auto max-w-3xl text-center">
             <h2 className="text-3xl font-bold tracking-tight md:text-4xl">Ready to Look Your Best?</h2>
             <p className="mt-4 text-lg text-primary-foreground/80">
