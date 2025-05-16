@@ -1,262 +1,110 @@
-import Link from "next/link"
 import Image from "next/image"
-import { ChevronLeft, Scissors, Star, Users, Award, Heart } from "lucide-react"
+import Link from "next/link"
+import { ArrowRight, Award, Clock, MapPin, Phone, Star, Users } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen bg-muted/40">
-      {/* Navigation */}
-      <header className="sticky top-0 z-40 border-b bg-background">
-        <div className="container flex h-16 items-center justify-between py-4">
-          <div className="flex items-center gap-2">
-            <Scissors className="h-6 w-6" />
-            <span className="text-xl font-bold">ClipMaster</span>
-          </div>
-          <nav className="hidden md:flex items-center gap-6">
-            <Link href="/" className="text-sm font-medium transition-colors hover:text-primary">
-              Home
-            </Link>
-            <Link href="/services" className="text-sm font-medium transition-colors hover:text-primary">
-              Services
-            </Link>
-            <Link href="/barbers" className="text-sm font-medium transition-colors hover:text-primary">
-              Our Barbers
-            </Link>
-            <Link href="/about" className="text-sm font-medium transition-colors text-primary">
-              About Us
-            </Link>
-            <Link href="/academy" className="text-sm font-medium transition-colors hover:text-primary">
-              Academy
-            </Link>
-            <Link href="/contact" className="text-sm font-medium transition-colors hover:text-primary">
-              Contact
-            </Link>
-          </nav>
-          <div className="flex items-center gap-4">
-            <Link href="/login">
-              <Button variant="outline">Login</Button>
-            </Link>
-            <Link href="/booking">
-              <Button>Book Appointment</Button>
-            </Link>
-          </div>
-        </div>
-      </header>
-
+    <div className="flex flex-col">
       {/* Hero Section */}
       <section className="relative">
-        <div className="absolute inset-0 bg-black/60 z-10" />
-        <div className="relative h-[400px] w-full">
+        <div className="absolute inset-0 bg-black/60" />
+        <div className="relative mx-auto flex max-w-[85rem] flex-col items-center px-4 py-20 text-center sm:px-6 md:py-24 lg:px-8">
+          <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl">About BarberStyle</h1>
+          <p className="mt-4 max-w-2xl text-lg text-white/80 md:text-xl">
+            Premium barbershop with a tradition of excellence since 2010
+          </p>
+        </div>
+        <div className="relative h-[40vh] w-full">
           <Image
-            src="/placeholder.svg?height=400&width=1200&text=About+ClipMaster"
-            alt="About ClipMaster"
+            src="/placeholder.svg?height=600&width=1600"
+            alt="Barbershop interior"
             fill
             className="object-cover"
             priority
           />
         </div>
-        <div className="container absolute inset-0 z-20 flex flex-col items-start justify-center text-white">
-          <div className="max-w-2xl">
-            <Link href="/" className="inline-flex items-center text-sm font-medium text-white/80 hover:text-white mb-4">
-              <ChevronLeft className="mr-1 h-4 w-4" />
-              Back to Home
-            </Link>
-            <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">About ClipMaster</h1>
-            <p className="mt-4 text-lg">
-              Discover the story behind our premium barbershop and our commitment to exceptional grooming services.
-            </p>
-          </div>
-        </div>
       </section>
 
       {/* Our Story */}
-      <section className="container py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-          <div>
-            <h2 className="text-3xl font-bold mb-6">Our Story</h2>
-            <p className="mb-4">
-              Founded in 2010, ClipMaster began as a single chair in a small downtown location with a simple mission: to
-              provide exceptional grooming services in a welcoming environment.
-            </p>
-            <p className="mb-4">
-              Over the years, we've grown to three distinct locations across the city, each with its own unique
-              character but all sharing the same commitment to quality, craftsmanship, and customer satisfaction.
+      <section className="container py-16 md:py-24">
+        <div className="mx-auto max-w-3xl">
+          <div className="mb-12 text-center">
+            <h2 className="text-3xl font-bold tracking-tight md:text-4xl">Our Story</h2>
+            <p className="mt-4 text-lg text-muted-foreground">A tradition of excellence in barbering</p>
+          </div>
+
+          <div className="space-y-6 text-lg">
+            <p>
+              Founded in 2010, BarberStyle began with a simple mission: to provide exceptional grooming services in a
+              comfortable, welcoming environment. What started as a small shop with two chairs has grown into a premier
+              barbershop destination.
             </p>
             <p>
-              Today, ClipMaster is recognized as one of the premier barbershops in the region, known for our skilled
-              barbers, attention to detail, and the perfect blend of traditional techniques with modern styles.
+              Our founder, Michael Thompson, brought over 15 years of experience when he opened our doors. His vision
+              was to combine traditional barbering techniques with modern styles and premium service.
+            </p>
+            <p>
+              Today, BarberStyle is proud to have a team of skilled professionals who share our commitment to quality,
+              style, and customer satisfaction. We've built our reputation on attention to detail and personalized
+              service that keeps our clients coming back.
             </p>
           </div>
-          <div className="relative h-[400px] rounded-lg overflow-hidden">
-            <Image
-              src="/placeholder.svg?height=400&width=600&text=Our+Story"
-              alt="ClipMaster Story"
-              fill
-              className="object-cover"
-            />
+
+          <div className="mt-12 grid gap-8 md:grid-cols-2">
+            <div className="relative h-64 overflow-hidden rounded-lg">
+              <Image
+                src="/placeholder.svg?height=400&width=600"
+                alt="Barbershop early days"
+                fill
+                className="object-cover"
+              />
+            </div>
+            <div className="relative h-64 overflow-hidden rounded-lg">
+              <Image src="/placeholder.svg?height=400&width=600" alt="Barbershop today" fill className="object-cover" />
+            </div>
           </div>
         </div>
       </section>
 
       {/* Our Values */}
-      <section className="bg-muted py-16">
+      <section className="bg-muted py-16 md:py-24">
         <div className="container">
-          <h2 className="text-3xl font-bold text-center mb-12">Our Values</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <Card>
-              <CardContent className="pt-6 flex flex-col items-center text-center">
-                <div className="rounded-full bg-primary/10 p-4 mb-4">
-                  <Award className="h-8 w-8 text-primary" />
-                </div>
-                <h3 className="text-xl font-bold mb-2">Excellence</h3>
-                <p className="text-muted-foreground">
-                  We strive for excellence in every haircut, every service, and every customer interaction.
-                </p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="pt-6 flex flex-col items-center text-center">
-                <div className="rounded-full bg-primary/10 p-4 mb-4">
-                  <Users className="h-8 w-8 text-primary" />
-                </div>
-                <h3 className="text-xl font-bold mb-2">Community</h3>
-                <p className="text-muted-foreground">
-                  We believe in building relationships and creating a welcoming space for everyone in our community.
-                </p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="pt-6 flex flex-col items-center text-center">
-                <div className="rounded-full bg-primary/10 p-4 mb-4">
-                  <Heart className="h-8 w-8 text-primary" />
-                </div>
-                <h3 className="text-xl font-bold mb-2">Passion</h3>
-                <p className="text-muted-foreground">
-                  We're passionate about our craft and dedicated to continuous learning and improvement.
-                </p>
-              </CardContent>
-            </Card>
+          <div className="mb-12 text-center">
+            <h2 className="text-3xl font-bold tracking-tight md:text-4xl">Our Values</h2>
+            <p className="mt-4 text-lg text-muted-foreground">The principles that guide everything we do</p>
           </div>
-        </div>
-      </section>
 
-      {/* Our Branches */}
-      <section className="container py-16">
-        <h2 className="text-3xl font-bold text-center mb-12">Our Branches</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <Card>
-            <CardContent className="p-0">
-              <div className="relative h-48 w-full">
-                <Image
-                  src="/placeholder.svg?height=200&width=400&text=Downtown"
-                  alt="Downtown Branch"
-                  fill
-                  className="object-cover rounded-t-lg"
-                />
-              </div>
-              <div className="p-6">
-                <h3 className="text-xl font-bold mb-2">Downtown</h3>
-                <p className="text-muted-foreground mb-4">
-                  Our flagship location in the heart of downtown, offering a full range of men's grooming services in a
-                  classic barbershop atmosphere.
-                </p>
-                <Link href="/branches/downtown">
-                  <Button className="w-full">Visit Branch</Button>
-                </Link>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-0">
-              <div className="relative h-48 w-full">
-                <Image
-                  src="/placeholder.svg?height=200&width=400&text=Uptown"
-                  alt="Uptown Branch"
-                  fill
-                  className="object-cover rounded-t-lg"
-                />
-              </div>
-              <div className="p-6">
-                <h3 className="text-xl font-bold mb-2">Uptown</h3>
-                <p className="text-muted-foreground mb-4">
-                  Our upscale location in the trendy uptown district, offering premium services for both men and women
-                  in a modern, luxurious setting.
-                </p>
-                <Link href="/branches/uptown">
-                  <Button className="w-full">Visit Branch</Button>
-                </Link>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-0">
-              <div className="relative h-48 w-full">
-                <Image
-                  src="/placeholder.svg?height=200&width=400&text=Westside"
-                  alt="Westside Branch"
-                  fill
-                  className="object-cover rounded-t-lg"
-                />
-              </div>
-              <div className="p-6">
-                <h3 className="text-xl font-bold mb-2">Westside</h3>
-                <p className="text-muted-foreground mb-4">
-                  Our relaxed westside location with ocean views, offering a full range of services for men and women in
-                  a laid-back, beachy atmosphere.
-                </p>
-                <Link href="/branches/westside">
-                  <Button className="w-full">Visit Branch</Button>
-                </Link>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
-
-      {/* Testimonials */}
-      <section className="bg-muted py-16">
-        <div className="container">
-          <h2 className="text-3xl font-bold text-center mb-12">What Our Clients Say</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
             {[
               {
-                name: "John D.",
-                comment:
-                  "I've been coming to ClipMaster for years and have never been disappointed. The attention to detail and consistent quality keeps me coming back.",
-                rating: 5,
+                icon: <Star className="h-10 w-10" />,
+                title: "Excellence",
+                description:
+                  "We strive for excellence in every haircut, every shave, and every interaction with our clients.",
               },
               {
-                name: "Michael T.",
-                comment:
-                  "The atmosphere is great, the barbers are skilled, and the service is always top-notch. ClipMaster is the best barbershop in the city.",
-                rating: 5,
+                icon: <Users className="h-10 w-10" />,
+                title: "Community",
+                description:
+                  "We're more than a barbershop – we're a community hub where people connect and relationships are built.",
               },
               {
-                name: "Robert S.",
-                comment:
-                  "From the moment you walk in, you feel welcome. The staff is friendly, professional, and truly cares about giving you the best experience possible.",
-                rating: 5,
+                icon: <Award className="h-10 w-10" />,
+                title: "Expertise",
+                description:
+                  "Our barbers are skilled professionals who continuously refine their craft and stay current with trends.",
               },
-            ].map((testimonial, index) => (
-              <Card key={index}>
-                <CardContent className="pt-6">
-                  <div className="flex items-center mb-4">
-                    {Array(5)
-                      .fill(0)
-                      .map((_, i) => (
-                        <Star
-                          key={i}
-                          className={`h-5 w-5 ${
-                            i < testimonial.rating ? "text-yellow-500 fill-yellow-500" : "text-gray-300"
-                          }`}
-                        />
-                      ))}
-                  </div>
-                  <p className="mb-4">"{testimonial.comment}"</p>
-                  <p className="font-bold">- {testimonial.name}</p>
+            ].map((value, index) => (
+              <Card key={index} className="bg-background">
+                <CardHeader>
+                  <div className="mb-2 text-primary">{value.icon}</div>
+                  <CardTitle>{value.title}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground">{value.description}</p>
                 </CardContent>
               </Card>
             ))}
@@ -264,83 +112,146 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-muted py-12 mt-auto">
+      {/* Our Team */}
+      <section className="container py-16 md:py-24">
+        <div className="mb-12 text-center">
+          <h2 className="text-3xl font-bold tracking-tight md:text-4xl">Meet Our Team</h2>
+          <p className="mt-4 text-lg text-muted-foreground">Skilled professionals dedicated to their craft</p>
+        </div>
+
+        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+          {[
+            {
+              name: "Alex Johnson",
+              role: "Master Barber",
+              image: "/placeholder.svg?height=500&width=500",
+              description: "With over 10 years of experience, Alex specializes in classic cuts and hot towel shaves.",
+            },
+            {
+              name: "Sam Rodriguez",
+              role: "Style Expert",
+              image: "/placeholder.svg?height=500&width=500",
+              description: "Sam brings creativity and precision to every haircut, known for modern styles and fades.",
+            },
+            {
+              name: "Jordan Smith",
+              role: "Beard Specialist",
+              image: "/placeholder.svg?height=500&width=500",
+              description:
+                "Jordan has mastered the art of beard sculpting and maintenance with meticulous attention to detail.",
+            },
+            {
+              name: "Taylor Williams",
+              role: "Color Specialist",
+              image: "/placeholder.svg?height=500&width=500",
+              description:
+                "Taylor's expertise in hair coloring helps clients achieve their perfect look with precision.",
+            },
+            {
+              name: "Morgan Lee",
+              role: "Junior Barber",
+              image: "/placeholder.svg?height=500&width=500",
+              description:
+                "The newest addition to our team, Morgan brings fresh perspective and enthusiasm to every client.",
+            },
+            {
+              name: "Michael Thompson",
+              role: "Founder & Barber",
+              image: "/placeholder.svg?height=500&width=500",
+              description: "Our founder still works the chair, bringing decades of experience and passion to the shop.",
+            },
+          ].map((barber, index) => (
+            <Card key={index} className="overflow-hidden">
+              <div className="relative h-72">
+                <Image
+                  src={barber.image || "/placeholder.svg"}
+                  alt={barber.name}
+                  fill
+                  className="object-cover object-center"
+                />
+              </div>
+              <CardHeader>
+                <CardTitle>{barber.name}</CardTitle>
+                <CardDescription>{barber.role}</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">{barber.description}</p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </section>
+
+      {/* Location */}
+      <section className="bg-muted py-16 md:py-24">
         <div className="container">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <Scissors className="h-6 w-6" />
-                <span className="text-xl font-bold">ClipMaster</span>
-              </div>
-              <p className="text-muted-foreground">
-                Premium barbershop providing quality haircuts and grooming services.
-              </p>
-            </div>
-            <div>
-              <h3 className="font-bold mb-4">Quick Links</h3>
-              <ul className="space-y-2">
-                <li>
-                  <Link href="/" className="text-muted-foreground hover:text-foreground">
-                    Home
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/services" className="text-muted-foreground hover:text-foreground">
-                    Services
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/barbers" className="text-muted-foreground hover:text-foreground">
-                    Our Barbers
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/about" className="text-muted-foreground hover:text-foreground">
-                    About Us
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/contact" className="text-muted-foreground hover:text-foreground">
-                    Contact
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-bold mb-4">Contact</h3>
-              <ul className="space-y-2">
-                <li className="flex items-center gap-2">
-                  <Scissors className="h-4 w-4" />
-                  <span className="text-muted-foreground">123 Main Street, Downtown</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Scissors className="h-4 w-4" />
-                  <span className="text-muted-foreground">info@clipmaster.com</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Scissors className="h-4 w-4" />
-                  <span className="text-muted-foreground">(123) 456-7890</span>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-bold mb-4">Hours</h3>
-              <div className="grid grid-cols-2 gap-2 text-muted-foreground">
-                <p>Monday - Friday</p>
-                <p>9:00 AM - 8:00 PM</p>
-                <p>Saturday</p>
-                <p>8:00 AM - 6:00 PM</p>
-                <p>Sunday</p>
-                <p>10:00 AM - 4:00 PM</p>
-              </div>
-            </div>
+          <div className="mb-12 text-center">
+            <h2 className="text-3xl font-bold tracking-tight md:text-4xl">Visit Us</h2>
+            <p className="mt-4 text-lg text-muted-foreground">Conveniently located in the heart of the city</p>
           </div>
-          <div className="border-t mt-8 pt-8 text-center text-muted-foreground">
-            <p>© {new Date().getFullYear()} ClipMaster Barbershop. All rights reserved.</p>
+
+          <div className="grid gap-8 md:grid-cols-2">
+            <Card>
+              <CardHeader>
+                <CardTitle>Our Location</CardTitle>
+                <CardDescription>Find us at</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-start gap-2">
+                  <MapPin className="mt-0.5 h-5 w-5 text-primary" />
+                  <div>
+                    <p className="font-medium">123 Barber Street</p>
+                    <p className="text-muted-foreground">Stylish City, SC 12345</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Phone className="h-5 w-5 text-primary" />
+                  <p>+1 (555) 123-4567</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Clock className="h-5 w-5 text-primary" />
+                  <div>
+                    <p className="font-medium">Opening Hours</p>
+                    <p className="text-muted-foreground">Monday - Friday: 9:00 - 20:00</p>
+                    <p className="text-muted-foreground">Saturday: 10:00 - 18:00</p>
+                    <p className="text-muted-foreground">Sunday: 10:00 - 16:00</p>
+                  </div>
+                </div>
+                <div className="pt-4">
+                  <Link href="/booking">
+                    <Button className="w-full gap-2">
+                      Book an Appointment <ArrowRight className="h-4 w-4" />
+                    </Button>
+                  </Link>
+                </div>
+              </CardContent>
+            </Card>
+
+            <div className="relative h-[300px] overflow-hidden rounded-lg md:h-auto">
+              <Image src="/placeholder.svg?height=600&width=800" alt="Map location" fill className="object-cover" />
+            </div>
           </div>
         </div>
-      </footer>
+      </section>
+
+      {/* CTA Section */}
+      <section className="bg-primary text-primary-foreground">
+        <div className="container py-16 md:py-24">
+          <div className="mx-auto max-w-3xl text-center">
+            <h2 className="text-3xl font-bold tracking-tight md:text-4xl">Experience the BarberStyle Difference</h2>
+            <p className="mt-4 text-lg text-primary-foreground/80">
+              Join our community of satisfied clients and discover why we're the premier barbershop in the city.
+            </p>
+            <div className="mt-8">
+              <Link href="/booking">
+                <Button size="lg" variant="secondary" className="gap-2">
+                  Book Your First Visit <ArrowRight className="h-4 w-4" />
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   )
 }

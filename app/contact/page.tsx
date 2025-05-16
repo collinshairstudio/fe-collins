@@ -1,370 +1,191 @@
+"use client"
+
+import type React from "react"
+
+import { useState } from "react"
 import Link from "next/link"
-import Image from "next/image"
-import { ChevronLeft, Scissors, MapPin, Phone, Mail, Clock } from "lucide-react"
+import { Facebook, Instagram, Mail, MapPin, Phone, Send, Twitter } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-
-// Branch data
-const branches = [
-  {
-    id: "downtown",
-    name: "Downtown",
-    address: "123 Main Street, Downtown",
-    phone: "(123) 456-7890",
-    email: "downtown@clipmaster.com",
-    image: "/placeholder.svg?height=300&width=600&text=Downtown+Branch",
-    hours: {
-      monday: "9:00 AM - 8:00 PM",
-      tuesday: "9:00 AM - 8:00 PM",
-      wednesday: "9:00 AM - 8:00 PM",
-      thursday: "9:00 AM - 8:00 PM",
-      friday: "9:00 AM - 8:00 PM",
-      saturday: "8:00 AM - 6:00 PM",
-      sunday: "10:00 AM - 4:00 PM",
-    },
-  },
-  {
-    id: "uptown",
-    name: "Uptown",
-    address: "456 Park Avenue, Uptown",
-    phone: "(234) 567-8901",
-    email: "uptown@clipmaster.com",
-    image: "/placeholder.svg?height=300&width=600&text=Uptown+Branch",
-    hours: {
-      monday: "9:00 AM - 8:00 PM",
-      tuesday: "9:00 AM - 8:00 PM",
-      wednesday: "9:00 AM - 8:00 PM",
-      thursday: "9:00 AM - 8:00 PM",
-      friday: "9:00 AM - 8:00 PM",
-      saturday: "8:00 AM - 6:00 PM",
-      sunday: "10:00 AM - 4:00 PM",
-    },
-  },
-  {
-    id: "westside",
-    name: "Westside",
-    address: "789 Ocean Drive, Westside",
-    phone: "(345) 678-9012",
-    email: "westside@clipmaster.com",
-    image: "/placeholder.svg?height=300&width=600&text=Westside+Branch",
-    hours: {
-      monday: "9:00 AM - 8:00 PM",
-      tuesday: "9:00 AM - 8:00 PM",
-      wednesday: "9:00 AM - 8:00 PM",
-      thursday: "9:00 AM - 8:00 PM",
-      friday: "9:00 AM - 8:00 PM",
-      saturday: "8:00 AM - 6:00 PM",
-      sunday: "10:00 AM - 4:00 PM",
-    },
-  },
-]
 
 export default function ContactPage() {
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSubmitted, setIsSubmitted] = useState(false)
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    setIsSubmitting(true)
+
+    // Simulate form submission
+    setTimeout(() => {
+      setIsSubmitting(false)
+      setIsSubmitted(true)
+    }, 1500)
+  }
+
   return (
-    <div className="min-h-screen bg-muted/40">
-      {/* Navigation */}
-      <header className="sticky top-0 z-40 border-b bg-background">
-        <div className="container flex h-16 items-center justify-between py-4">
-          <div className="flex items-center gap-2">
-            <Scissors className="h-6 w-6" />
-            <span className="text-xl font-bold">ClipMaster</span>
-          </div>
-          <nav className="hidden md:flex items-center gap-6">
-            <Link href="/" className="text-sm font-medium transition-colors hover:text-primary">
-              Home
-            </Link>
-            <Link href="/services" className="text-sm font-medium transition-colors hover:text-primary">
-              Services
-            </Link>
-            <Link href="/barbers" className="text-sm font-medium transition-colors hover:text-primary">
-              Our Barbers
-            </Link>
-            <Link href="/about" className="text-sm font-medium transition-colors hover:text-primary">
-              About Us
-            </Link>
-            <Link href="/academy" className="text-sm font-medium transition-colors hover:text-primary">
-              Academy
-            </Link>
-            <Link href="/contact" className="text-sm font-medium transition-colors text-primary">
-              Contact
-            </Link>
-          </nav>
-          <div className="flex items-center gap-4">
-            <Link href="/login">
-              <Button variant="outline">Login</Button>
-            </Link>
-            <Link href="/booking">
-              <Button>Book Appointment</Button>
-            </Link>
-          </div>
-        </div>
-      </header>
-
-      <div className="container py-8">
-        <div className="mb-8">
-          <Link href="/" className="inline-flex items-center text-sm font-medium text-primary hover:underline">
-            <ChevronLeft className="mr-1 h-4 w-4" />
-            Back to Home
-          </Link>
-          <h1 className="mt-2 text-3xl font-bold tracking-tight">Contact Us</h1>
-          <p className="text-muted-foreground">
-            Get in touch with us for appointments, inquiries, or feedback. We'd love to hear from you.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
-          <div>
-            <Card>
-              <CardHeader>
-                <CardTitle>Send Us a Message</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <form className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="first-name">First name</Label>
-                      <Input id="first-name" placeholder="John" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="last-name">Last name</Label>
-                      <Input id="last-name" placeholder="Doe" />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
-                    <Input id="email" type="email" placeholder="john.doe@example.com" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="phone">Phone Number</Label>
-                    <Input id="phone" type="tel" placeholder="(123) 456-7890" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="branch">Branch</Label>
-                    <select
-                      id="branch"
-                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                    >
-                      <option value="">Select a branch</option>
-                      <option value="downtown">Downtown</option>
-                      <option value="uptown">Uptown</option>
-                      <option value="westside">Westside</option>
-                    </select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="subject">Subject</Label>
-                    <Input id="subject" placeholder="Appointment Inquiry" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="message">Message</Label>
-                    <Textarea id="message" placeholder="Your message here..." className="min-h-[120px]" />
-                  </div>
-                  <Button type="submit" className="w-full">
-                    Send Message
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="space-y-8">
-            <Card>
-              <CardHeader>
-                <CardTitle>Our Branches</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Tabs defaultValue="downtown" className="w-full">
-                  <TabsList className="grid w-full grid-cols-3">
-                    <TabsTrigger value="downtown">Downtown</TabsTrigger>
-                    <TabsTrigger value="uptown">Uptown</TabsTrigger>
-                    <TabsTrigger value="westside">Westside</TabsTrigger>
-                  </TabsList>
-
-                  {branches.map((branch) => (
-                    <TabsContent key={branch.id} value={branch.id}>
-                      <div className="space-y-4">
-                        <div className="relative h-48 w-full rounded-lg overflow-hidden">
-                          <Image
-                            src={branch.image || "/placeholder.svg"}
-                            alt={branch.name}
-                            fill
-                            className="object-cover"
-                          />
-                        </div>
-                        <div className="space-y-3">
-                          <div className="flex items-start">
-                            <MapPin className="h-5 w-5 mr-3 mt-0.5 text-primary" />
-                            <div>
-                              <h3 className="font-medium">Address</h3>
-                              <p className="text-muted-foreground">{branch.address}</p>
-                            </div>
-                          </div>
-                          <div className="flex items-start">
-                            <Phone className="h-5 w-5 mr-3 mt-0.5 text-primary" />
-                            <div>
-                              <h3 className="font-medium">Phone</h3>
-                              <p className="text-muted-foreground">{branch.phone}</p>
-                            </div>
-                          </div>
-                          <div className="flex items-start">
-                            <Mail className="h-5 w-5 mr-3 mt-0.5 text-primary" />
-                            <div>
-                              <h3 className="font-medium">Email</h3>
-                              <p className="text-muted-foreground">{branch.email}</p>
-                            </div>
-                          </div>
-                          <div className="flex items-start">
-                            <Clock className="h-5 w-5 mr-3 mt-0.5 text-primary" />
-                            <div>
-                              <h3 className="font-medium">Hours</h3>
-                              <div className="text-muted-foreground text-sm">
-                                <p>Monday - Friday: {branch.hours.monday}</p>
-                                <p>Saturday: {branch.hours.saturday}</p>
-                                <p>Sunday: {branch.hours.sunday}</p>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="pt-4">
-                          <Link href={`/branches/${branch.id}`}>
-                            <Button variant="outline" className="w-full">
-                              View Branch Details
-                            </Button>
-                          </Link>
-                        </div>
-                      </div>
-                    </TabsContent>
-                  ))}
-                </Tabs>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Corporate Office</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div className="flex items-start">
-                    <MapPin className="h-5 w-5 mr-3 mt-0.5 text-primary" />
-                    <div>
-                      <h3 className="font-medium">Address</h3>
-                      <p className="text-muted-foreground">789 Corporate Blvd, Suite 500, New York, NY 10001</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start">
-                    <Phone className="h-5 w-5 mr-3 mt-0.5 text-primary" />
-                    <div>
-                      <h3 className="font-medium">Phone</h3>
-                      <p className="text-muted-foreground">(123) 456-7890</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start">
-                    <Mail className="h-5 w-5 mr-3 mt-0.5 text-primary" />
-                    <div>
-                      <h3 className="font-medium">Email</h3>
-                      <p className="text-muted-foreground">corporate@clipmaster.com</p>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-
-        <div className="mt-12">
-          <h2 className="text-2xl font-bold mb-6">Find Us</h2>
-          <div className="bg-muted h-[400px] rounded-lg overflow-hidden">
-            {/* This would be a map in a real implementation */}
-            <div className="h-full w-full flex items-center justify-center bg-muted">
-              <MapPin className="h-12 w-12 text-muted-foreground" />
-              <span className="ml-2 text-lg text-muted-foreground">Map of All ClipMaster Locations</span>
-            </div>
-          </div>
-        </div>
+    <div className="container py-12 md:py-16">
+      <div className="mb-12 text-center">
+        <h1 className="text-3xl font-bold tracking-tight md:text-4xl">Contact Us</h1>
+        <p className="mt-4 text-lg text-muted-foreground">We'd love to hear from you. Get in touch with our team.</p>
       </div>
 
-      {/* Footer */}
-      <footer className="bg-muted py-12 mt-12">
-        <div className="container">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <Scissors className="h-6 w-6" />
-                <span className="text-xl font-bold">ClipMaster</span>
+      <div className="grid gap-8 md:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle>Send us a message</CardTitle>
+            <CardDescription>Fill out the form below and we'll get back to you as soon as possible.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {isSubmitted ? (
+              <div className="flex flex-col items-center justify-center py-8 text-center">
+                <div className="mb-4 rounded-full bg-primary/10 p-3 text-primary">
+                  <Send className="h-6 w-6" />
+                </div>
+                <h3 className="text-xl font-medium">Message Sent!</h3>
+                <p className="mt-2 text-muted-foreground">
+                  Thank you for reaching out. We'll respond to your inquiry shortly.
+                </p>
+                <Button className="mt-6" onClick={() => setIsSubmitted(false)}>
+                  Send Another Message
+                </Button>
               </div>
-              <p className="text-muted-foreground">
-                Premium barbershop providing quality haircuts and grooming services.
-              </p>
-            </div>
-            <div>
-              <h3 className="font-bold mb-4">Quick Links</h3>
-              <ul className="space-y-2">
-                <li>
-                  <Link href="/" className="text-muted-foreground hover:text-foreground">
-                    Home
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/services" className="text-muted-foreground hover:text-foreground">
-                    Services
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/barbers" className="text-muted-foreground hover:text-foreground">
-                    Our Barbers
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/about" className="text-muted-foreground hover:text-foreground">
-                    About Us
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/contact" className="text-muted-foreground hover:text-foreground">
-                    Contact
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-bold mb-4">Contact</h3>
-              <ul className="space-y-2">
-                <li className="flex items-center gap-2">
-                  <Scissors className="h-4 w-4" />
-                  <span className="text-muted-foreground">123 Main Street, Downtown</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Scissors className="h-4 w-4" />
-                  <span className="text-muted-foreground">info@clipmaster.com</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Scissors className="h-4 w-4" />
-                  <span className="text-muted-foreground">(123) 456-7890</span>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-bold mb-4">Hours</h3>
-              <div className="grid grid-cols-2 gap-2 text-muted-foreground">
-                <p>Monday - Friday</p>
-                <p>9:00 AM - 8:00 PM</p>
-                <p>Saturday</p>
-                <p>8:00 AM - 6:00 PM</p>
-                <p>Sunday</p>
-                <p>10:00 AM - 4:00 PM</p>
+            ) : (
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="firstName">First name</Label>
+                    <Input id="firstName" placeholder="John" required />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="lastName">Last name</Label>
+                    <Input id="lastName" placeholder="Doe" required />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input id="email" type="email" placeholder="name@example.com" required />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="phone">Phone number</Label>
+                  <Input id="phone" type="tel" placeholder="+1 (555) 000-0000" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="subject">Subject</Label>
+                  <Input id="subject" placeholder="How can we help you?" required />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="message">Message</Label>
+                  <Textarea id="message" placeholder="Please provide details about your inquiry..." rows={5} required />
+                </div>
+                <Button type="submit" className="w-full" disabled={isSubmitting}>
+                  {isSubmitting ? "Sending..." : "Send Message"}
+                </Button>
+              </form>
+            )}
+          </CardContent>
+        </Card>
+
+        <div className="space-y-8">
+          <Card>
+            <CardHeader>
+              <CardTitle>Contact Information</CardTitle>
+              <CardDescription>Reach out to us directly</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-start gap-3">
+                <MapPin className="mt-0.5 h-5 w-5 text-primary" />
+                <div>
+                  <p className="font-medium">Our Location</p>
+                  <p className="text-muted-foreground">123 Barber Street</p>
+                  <p className="text-muted-foreground">Stylish City, SC 12345</p>
+                </div>
               </div>
-            </div>
-          </div>
-          <div className="border-t mt-8 pt-8 text-center text-muted-foreground">
-            <p>© {new Date().getFullYear()} ClipMaster Barbershop. All rights reserved.</p>
-          </div>
+              <div className="flex items-center gap-3">
+                <Phone className="h-5 w-5 text-primary" />
+                <div>
+                  <p className="font-medium">Phone</p>
+                  <p className="text-muted-foreground">+1 (555) 123-4567</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <Mail className="h-5 w-5 text-primary" />
+                <div>
+                  <p className="font-medium">Email</p>
+                  <p className="text-muted-foreground">info@barberstyle.com</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Business Hours</CardTitle>
+              <CardDescription>When you can visit us</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <span className="font-medium">Monday - Friday</span>
+                  <span>9:00 - 20:00</span>
+                </div>
+                <Separator />
+                <div className="flex justify-between">
+                  <span className="font-medium">Saturday</span>
+                  <span>10:00 - 18:00</span>
+                </div>
+                <Separator />
+                <div className="flex justify-between">
+                  <span className="font-medium">Sunday</span>
+                  <span>10:00 - 16:00</span>
+                </div>
+              </div>
+            </CardContent>
+            <CardFooter>
+              <Link href="/booking" className="w-full">
+                <Button className="w-full">Book an Appointment</Button>
+              </Link>
+            </CardFooter>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Follow Us</CardTitle>
+              <CardDescription>Stay connected on social media</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex gap-4">
+                <Link
+                  href="#"
+                  className="rounded-full bg-muted p-3 text-muted-foreground transition-colors hover:bg-primary hover:text-primary-foreground"
+                >
+                  <Facebook className="h-5 w-5" />
+                  <span className="sr-only">Facebook</span>
+                </Link>
+                <Link
+                  href="#"
+                  className="rounded-full bg-muted p-3 text-muted-foreground transition-colors hover:bg-primary hover:text-primary-foreground"
+                >
+                  <Instagram className="h-5 w-5" />
+                  <span className="sr-only">Instagram</span>
+                </Link>
+                <Link
+                  href="#"
+                  className="rounded-full bg-muted p-3 text-muted-foreground transition-colors hover:bg-primary hover:text-primary-foreground"
+                >
+                  <Twitter className="h-5 w-5" />
+                  <span className="sr-only">Twitter</span>
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
         </div>
-      </footer>
+      </div>
     </div>
   )
 }
