@@ -16,8 +16,9 @@ export function Navbar() {
     { href: "/", label: "Home" },
     { href: "/services", label: "Services" },
     { href: "/booking", label: "Booking" },
+    { href: "/academy", label: "Academy"},
     { href: "/about", label: "About" },
-    { href: "/contact", label: "Contact" },
+    { href: "/contact", label: "Contact"}
   ]
 
   return (

@@ -173,43 +173,6 @@ const programsData = [
 export default function AcademyPage() {
   return (
     <div className="min-h-screen bg-muted/40">
-      {/* Navigation */}
-      <header className="sticky top-0 z-40 border-b bg-background">
-        <div className="container flex h-16 items-center justify-between py-4">
-          <div className="flex items-center gap-2">
-            <Scissors className="h-6 w-6" />
-            <span className="text-xl font-bold">ClipMaster</span>
-          </div>
-          <nav className="hidden md:flex items-center gap-6">
-            <Link href="/" className="text-sm font-medium transition-colors hover:text-primary">
-              Home
-            </Link>
-            <Link href="/services" className="text-sm font-medium transition-colors hover:text-primary">
-              Services
-            </Link>
-            <Link href="/barbers" className="text-sm font-medium transition-colors hover:text-primary">
-              Our Barbers
-            </Link>
-            <Link href="/about" className="text-sm font-medium transition-colors hover:text-primary">
-              About Us
-            </Link>
-            <Link href="/academy" className="text-sm font-medium transition-colors text-primary">
-              Academy
-            </Link>
-            <Link href="/contact" className="text-sm font-medium transition-colors hover:text-primary">
-              Contact
-            </Link>
-          </nav>
-          <div className="flex items-center gap-4">
-            <Link href="/login">
-              <Button variant="outline">Login</Button>
-            </Link>
-            <Link href="/booking">
-              <Button>Book Appointment</Button>
-            </Link>
-          </div>
-        </div>
-      </header>
 
       {/* Hero Section */}
       <section className="relative">
@@ -278,48 +241,6 @@ export default function AcademyPage() {
               fill
               className="object-cover"
             />
-          </div>
-        </div>
-      </section>
-
-      {/* Why Choose Us */}
-      <section className="bg-muted py-16">
-        <div className="container">
-          <h2 className="text-3xl font-bold text-center mb-12">Why Choose ClipMaster Academy</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <Card>
-              <CardContent className="pt-6 flex flex-col items-center text-center">
-                <div className="rounded-full bg-primary/10 p-4 mb-4">
-                  <GraduationCap className="h-8 w-8 text-primary" />
-                </div>
-                <h3 className="text-xl font-bold mb-2">Expert Instructors</h3>
-                <p className="text-muted-foreground">
-                  Learn from industry professionals with years of experience in both barbering and education.
-                </p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="pt-6 flex flex-col items-center text-center">
-                <div className="rounded-full bg-primary/10 p-4 mb-4">
-                  <Award className="h-8 w-8 text-primary" />
-                </div>
-                <h3 className="text-xl font-bold mb-2">Hands-On Training</h3>
-                <p className="text-muted-foreground">
-                  Gain practical experience with real clients in our student barbershop under expert supervision.
-                </p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="pt-6 flex flex-col items-center text-center">
-                <div className="rounded-full bg-primary/10 p-4 mb-4">
-                  <Users className="h-8 w-8 text-primary" />
-                </div>
-                <h3 className="text-xl font-bold mb-2">Career Support</h3>
-                <p className="text-muted-foreground">
-                  Benefit from our industry connections and job placement assistance after graduation.
-                </p>
-              </CardContent>
-            </Card>
           </div>
         </div>
       </section>
@@ -398,79 +319,6 @@ export default function AcademyPage() {
               </TabsContent>
             ))}
           </Tabs>
-        </div>
-      </section>
-
-      {/* Facilities */}
-      <section className="container py-16">
-        <h2 className="text-3xl font-bold text-center mb-12">Our Facilities</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div className="relative h-64 rounded-lg overflow-hidden">
-            <Image
-              src="/placeholder.svg?height=300&width=500&text=Training+Studio"
-              alt="Training Studio"
-              fill
-              className="object-cover"
-            />
-            <div className="absolute inset-0 bg-black/40 flex items-end p-4">
-              <h3 className="text-white text-xl font-bold">Training Studio</h3>
-            </div>
-          </div>
-          <div className="relative h-64 rounded-lg overflow-hidden">
-            <Image
-              src="/placeholder.svg?height=300&width=500&text=Student+Barbershop"
-              alt="Student Barbershop"
-              fill
-              className="object-cover"
-            />
-            <div className="absolute inset-0 bg-black/40 flex items-end p-4">
-              <h3 className="text-white text-xl font-bold">Student Barbershop</h3>
-            </div>
-          </div>
-          <div className="relative h-64 rounded-lg overflow-hidden">
-            <Image
-              src="/placeholder.svg?height=300&width=500&text=Theory+Classroom"
-              alt="Theory Classroom"
-              fill
-              className="object-cover"
-            />
-            <div className="absolute inset-0 bg-black/40 flex items-end p-4">
-              <h3 className="text-white text-xl font-bold">Theory Classroom</h3>
-            </div>
-          </div>
-          <div className="relative h-64 rounded-lg overflow-hidden">
-            <Image
-              src="/placeholder.svg?height=300&width=500&text=Product+Lab"
-              alt="Product Lab"
-              fill
-              className="object-cover"
-            />
-            <div className="absolute inset-0 bg-black/40 flex items-end p-4">
-              <h3 className="text-white text-xl font-bold">Product Lab</h3>
-            </div>
-          </div>
-          <div className="relative h-64 rounded-lg overflow-hidden">
-            <Image
-              src="/placeholder.svg?height=300&width=500&text=Student+Lounge"
-              alt="Student Lounge"
-              fill
-              className="object-cover"
-            />
-            <div className="absolute inset-0 bg-black/40 flex items-end p-4">
-              <h3 className="text-white text-xl font-bold">Student Lounge</h3>
-            </div>
-          </div>
-          <div className="relative h-64 rounded-lg overflow-hidden">
-            <Image
-              src="/placeholder.svg?height=300&width=500&text=Resource+Library"
-              alt="Resource Library"
-              fill
-              className="object-cover"
-            />
-            <div className="absolute inset-0 bg-black/40 flex items-end p-4">
-              <h3 className="text-white text-xl font-bold">Resource Library</h3>
-            </div>
-          </div>
         </div>
       </section>
 
