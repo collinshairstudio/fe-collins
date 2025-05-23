@@ -17,7 +17,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { toast } from "@/components/ui/use-toast"
 
 // API Base URLs
-const API_BASE_URL = "http://localhost:5000/api/bookings"
+const API_BASE_URL = "https://be-collins.vercel.app/api/bookings"
 const CREATE_BOOKING_URL = "https://be-collins.vercel.app/api/bookings"
 
 // Types
