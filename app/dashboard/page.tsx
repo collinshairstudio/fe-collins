@@ -20,13 +20,17 @@ type Booking = {
   barber: {
     id: number
     name: string
+    image?: string
   }
-  service: {
+  service_id: number[] // Array of service IDs
+  services?: { // Optional array of service details
     id: number
     name: string
     price?: number
-    duration?: string
-  }
+    duration?: number
+  }[]
+  total_price: number
+  total_duration: number
 }
 
 const statusColors = {
@@ -57,14 +61,12 @@ export default function DashboardPage() {
           return
         }
 
-        // Menggunakan endpoint yang sesuai dengan backend
         const response = await fetch(`https://be-collins.vercel.app/api/bookings/by-user/${userId}`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
         })
 
-        // Handle unauthorized (401) secara khusus
         if (response.status === 401) {
           localStorage.removeItem('token')
           localStorage.removeItem('userId')
@@ -80,20 +82,33 @@ export default function DashboardPage() {
         
         if (data.success) {
           const now = new Date()
-          const upcoming = data.data.filter((booking: Booking) => 
-            new Date(booking.schedule) >= now && booking.status === 'confirmed'
-          ).sort((a: Booking, b: Booking) => 
-            new Date(a.schedule).getTime() - new Date(b.schedule).getTime()
-          )
           
-          const past = data.data.filter((booking: Booking) => 
-            new Date(booking.schedule) < now || booking.status !== 'confirmed'
-          ).sort((a: Booking, b: Booking) => 
-            new Date(b.schedule).getTime() - new Date(a.schedule).getTime()
-          )
+          const processBookings = (bookings: Booking[]) => {
+            return bookings.map(booking => ({
+              ...booking,
+              // Pastikan services selalu berupa array
+              services: booking.services || []
+            }))
+          }
 
-          setUpcomingAppointments(upcoming)
-          setPastAppointments(past)
+          const upcoming = data.data
+            .filter((booking: Booking) => 
+              new Date(booking.schedule) >= now && booking.status === 'confirmed'
+            )
+            .sort((a: Booking, b: Booking) => 
+              new Date(a.schedule).getTime() - new Date(b.schedule).getTime()
+            )
+          
+          const past = data.data
+            .filter((booking: Booking) => 
+              new Date(booking.schedule) < now || booking.status !== 'confirmed'
+            )
+            .sort((a: Booking, b: Booking) => 
+              new Date(b.schedule).getTime() - new Date(a.schedule).getTime()
+            )
+
+          setUpcomingAppointments(processBookings(upcoming))
+          setPastAppointments(processBookings(past))
         } else {
           throw new Error(data.error?.message || 'Failed to fetch bookings')
         }
@@ -160,7 +175,6 @@ export default function DashboardPage() {
       const data = await response.json()
       
       if (data.success) {
-        // Update local state
         const cancelledBooking = upcomingAppointments.find(b => b.id === bookingId)
         if (cancelledBooking) {
           setUpcomingAppointments(upcomingAppointments.filter(b => b.id !== bookingId))
@@ -187,8 +201,10 @@ export default function DashboardPage() {
     }
   }
 
-  const handleBookAgain = (serviceId: number, barberId: number) => {
-    router.push(`/booking?serviceId=${serviceId}&barberId=${barberId}`)
+  const handleBookAgain = (serviceIds: number[], barberId: number) => {
+    // Mengambil service pertama sebagai default
+    const primaryServiceId = serviceIds[0]
+    router.push(`/booking?serviceId=${primaryServiceId}&barberId=${barberId}`)
   }
 
   if (isLoading) {
@@ -259,7 +275,11 @@ export default function DashboardPage() {
                       <div className="flex items-start justify-between">
                         <div>
                           <div className="flex items-center gap-2">
-                            <h3 className="font-medium">{appointment.service.name}</h3>
+                            <h3 className="font-medium">
+                              {appointment.services.length > 0 
+                                ? appointment.services.map(s => s.name).join(', ')
+                                : 'No service specified'}
+                            </h3>
                             <Badge variant="outline" className={statusColors[appointment.status]}>
                               {appointment.status}
                             </Badge>
@@ -277,9 +297,12 @@ export default function DashboardPage() {
                               <Clock className="h-3.5 w-3.5" />
                               <span>{formatTime(appointment.schedule)}</span>
                             </div>
-                            {appointment.service.price && (
+                            <div className="flex items-center gap-1">
+                              <span>Rp{appointment.total_price.toLocaleString()}</span>
+                            </div>
+                            {appointment.total_duration > 0 && (
                               <div className="flex items-center gap-1">
-                                <span>Rp{appointment.service.price.toLocaleString()}</span>
+                                <span>{appointment.total_duration} mins</span>
                               </div>
                             )}
                           </div>
@@ -336,7 +359,11 @@ export default function DashboardPage() {
                       <div className="flex items-start justify-between">
                         <div>
                           <div className="flex items-center gap-2">
-                            <h3 className="font-medium">{appointment.service.name}</h3>
+                            <h3 className="font-medium">
+                              {appointment.services.length > 0 
+                                ? appointment.services.map(s => s.name).join(', ')
+                                : 'No service specified'}
+                            </h3>
                             <Badge variant="outline" className={statusColors[appointment.status]}>
                               {appointment.status}
                             </Badge>
@@ -354,11 +381,9 @@ export default function DashboardPage() {
                               <Clock className="h-3.5 w-3.5" />
                               <span>{formatTime(appointment.schedule)}</span>
                             </div>
-                            {appointment.service.price && (
-                              <div className="flex items-center gap-1">
-                                <span>Rp{appointment.service.price.toLocaleString()}</span>
-                              </div>
-                            )}
+                            <div className="flex items-center gap-1">
+                              <span>Rp{appointment.total_price.toLocaleString()}</span>
+                            </div>
                           </div>
                         </div>
                         <DropdownMenu>
@@ -370,7 +395,7 @@ export default function DashboardPage() {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem 
-                              onClick={() => handleBookAgain(appointment.service.id, appointment.barber.id)}
+                              onClick={() => handleBookAgain(appointment.service_id, appointment.barber.id)}
                             >
                               Book Again
                             </DropdownMenuItem>

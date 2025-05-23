@@ -1,9 +1,9 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { CalendarIcon, ChevronLeft, Clock } from "lucide-react"
+import { CalendarIcon, ChevronLeft, Clock, Loader2 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
@@ -13,68 +13,166 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Separator } from "@/components/ui/separator"
 import { cn } from "@/lib/utils"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { toast } from "@/components/ui/use-toast"
 
-// Sample data - replace with actual API calls in production
-const barbers = [
-  {
-    id: 1,
-    name: "Alex Johnson",
-    image: "/placeholder.svg?height=100&width=100",
-    specialties: ["Classic Cuts", "Hot Towel Shaves"],
-  },
-  {
-    id: 2,
-    name: "Sam Rodriguez",
-    image: "/placeholder.svg?height=100&width=100",
-    specialties: ["Modern Styles", "Fades"],
-  },
-  {
-    id: 3,
-    name: "Jordan Smith",
-    image: "/placeholder.svg?height=100&width=100",
-    specialties: ["Beard Styling", "Hair Design"],
-  },
-]
+// API Base URLs
+const API_BASE_URL = "http://localhost:5000/api/bookings"
+const CREATE_BOOKING_URL = "https://be-collins.vercel.app/api/bookings"
 
-const services = [
-  { id: 1, name: "Classic Haircut", duration: "30 min", price: 250000 },
-  { id: 2, name: "Beard Trim", duration: "15 min", price: 150000 },
-  { id: 3, name: "Hot Towel Shave", duration: "45 min", price: 300000 },
-  { id: 4, name: "Haircut & Beard Trim", duration: "45 min", price: 350000 },
-  { id: 5, name: "Deluxe Package", duration: "60 min", price: 500000 },
-]
+// Types
+interface Barber {
+  id: number
+  name: string
+  created_at: string
+  image?: string
+  specialties?: string[]
+}
 
-const timeSlots = [
-  "9:00 AM",
-  "9:30 AM",
-  "10:00 AM",
-  "10:30 AM",
-  "11:00 AM",
-  "11:30 AM",
-  "1:00 PM",
-  "1:30 PM",
-  "2:00 PM",
-  "2:30 PM",
-  "3:00 PM",
-  "3:30 PM",
-  "4:00 PM",
-  "4:30 PM",
-  "5:00 PM",
-  "5:30 PM",
-]
+interface Service {
+  id: number
+  name: string
+  price: number
+  duration: number | null
+  created_at: string
+}
+
+interface TimeSlot {
+  time: string
+  display: string
+}
+
+interface AvailableSchedule {
+  date: string
+  capster_id: string
+  available_slots: TimeSlot[]
+}
 
 export default function BookingPage() {
   const router = useRouter()
+  
+  // State for form data
   const [selectedBarber, setSelectedBarber] = useState<number | null>(null)
   const [selectedServices, setSelectedServices] = useState<number[]>([])
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined)
   const [selectedTime, setSelectedTime] = useState<string | null>(null)
-  const [isLoading, setIsLoading] = useState(false)
+  
+  // State for API data
+  const [barbers, setBarbers] = useState<Barber[]>([])
+  const [services, setServices] = useState<Service[]>([])
+  const [availableSlots, setAvailableSlots] = useState<TimeSlot[]>([])
+  
+  // Loading states
+  const [isLoadingBarbers, setIsLoadingBarbers] = useState(true)
+  const [isLoadingServices, setIsLoadingServices] = useState(true)
+  const [isLoadingSlots, setIsLoadingSlots] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  
+  // Error states
+  const [error, setError] = useState<string | null>(null)
+
+  // Fetch barbers on component mount
+  useEffect(() => {
+    fetchBarbers()
+    fetchServices()
+  }, [])
+
+  // Fetch available slots when barber and date are selected
+  useEffect(() => {
+    if (selectedBarber && selectedDate) {
+      fetchAvailableSlots()
+    } else {
+      setAvailableSlots([])
+      setSelectedTime(null)
+    }
+  }, [selectedBarber, selectedDate])
+
+  const fetchBarbers = async () => {
+    try {
+      setIsLoadingBarbers(true)
+      const response = await fetch(`${API_BASE_URL}/capsters`)
+      const data = await response.json()
+      
+      if (data.success) {
+        setBarbers(data.data)
+      } else {
+        throw new Error('Failed to fetch barbers')
+      }
+    } catch (error) {
+      console.error('Error fetching barbers:', error)
+      setError('Failed to load barbers. Please try again.')
+    } finally {
+      setIsLoadingBarbers(false)
+    }
+  }
+
+  const fetchServices = async () => {
+    try {
+      setIsLoadingServices(true)
+      const response = await fetch(`${API_BASE_URL}/services`)
+      const data = await response.json()
+      
+      if (data.success) {
+        setServices(data.data)
+      } else {
+        throw new Error('Failed to fetch services')
+      }
+    } catch (error) {
+      console.error('Error fetching services:', error)
+      setError('Failed to load services. Please try again.')
+    } finally {
+      setIsLoadingServices(false)
+    }
+  }
+
+  const fetchAvailableSlots = async () => {
+    if (!selectedBarber || !selectedDate) return
+    
+    try {
+      setIsLoadingSlots(true)
+      // Format tanggal ke YYYY-MM-DD dengan memperhatikan timezone lokal
+      const dateStr = formatLocalDate(selectedDate)
+      const response = await fetch(
+        `${API_BASE_URL}/available-schedules?capster_id=${selectedBarber}&date=${dateStr}`
+      )
+      const data = await response.json()
+      
+      if (data.success) {
+        setAvailableSlots(data.data.available_slots || [])
+      } else {
+        throw new Error('Failed to fetch available slots')
+      }
+    } catch (error) {
+      console.error('Error fetching available slots:', error)
+      setAvailableSlots([])
+      toast({
+        title: "Error",
+        description: "Failed to load available time slots. Please try again.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsLoadingSlots(false)
+    }
+  }
+
+  // Fungsi untuk memformat tanggal ke YYYY-MM-DD sesuai timezone lokal
+  const formatLocalDate = (date: Date): string => {
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    return `${year}-${month}-${day}`
+  }
 
   // Calculate total price based on selected services
   const totalPrice = selectedServices.reduce((sum, serviceId) => {
     const service = services.find((s) => s.id === serviceId)
     return sum + (service?.price || 0)
+  }, 0)
+
+  // Calculate total duration
+  const totalDuration = selectedServices.reduce((sum, serviceId) => {
+    const service = services.find((s) => s.id === serviceId)
+    return sum + (service?.duration || 0)
   }, 0)
 
   const handleServiceToggle = (serviceId: number) => {
@@ -87,23 +185,91 @@ export default function BookingPage() {
     })
   }
 
-  const handleConfirm = () => {
+  const handleBarberChange = (barberId: number) => {
+    setSelectedBarber(barberId)
+    // Reset time selection when barber changes
+    setSelectedTime(null)
+  }
+
+  const handleDateChange = (date: Date | undefined) => {
+    setSelectedDate(date)
+    // Reset time selection when date changes
+    setSelectedTime(null)
+  }
+
+  const handleConfirm = async () => {
     if (!selectedBarber || selectedServices.length === 0 || !selectedDate || !selectedTime) {
-      // Show validation errors
+      toast({
+        title: "Incomplete Information",
+        description: "Please fill in all required fields before confirming your booking.",
+        variant: "destructive",
+      })
       return
     }
 
-    setIsLoading(true)
+    // Get user_id from localStorage or authentication context
+    const userId = localStorage.getItem('user_id') || 'default-user-uuid' // Replace with actual user management
 
-    // Simulate booking process
-    setTimeout(() => {
-      setIsLoading(false)
-      router.push("/booking/success")
-    }, 1500)
+    const bookingData = {
+      capster_id: selectedBarber,
+      service_ids: selectedServices,
+      date: formatLocalDate(selectedDate), // Gunakan formatLocalDate
+      time: selectedTime
+    }
+
+    try {
+      setIsSubmitting(true)
+      
+      const token = localStorage.getItem('token')
+      const response = await fetch(CREATE_BOOKING_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token && { 'Authorization': `Bearer ${token}` }),
+        },
+        body: JSON.stringify(bookingData)
+      })
+
+      const result = await response.json()
+
+      if (result.success) {
+        toast({
+          title: "Booking Confirmed!",
+          description: "Your appointment has been successfully booked.",
+        })
+        router.push("/booking/success")
+      } else {
+        throw new Error(result.error?.message || 'Failed to create booking')
+      }
+    } catch (error) {
+      console.error('Error creating booking:', error)
+      toast({
+        title: "Booking Failed",
+        description: (error instanceof Error ? error.message : "Failed to create booking. Please try again."),
+        variant: "destructive",
+      })
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const isFormValid = () => {
     return selectedBarber && selectedServices.length > 0 && selectedDate && selectedTime
+  }
+
+  if (error && (isLoadingBarbers || isLoadingServices)) {
+    return (
+      <div className="container py-12">
+        <div className="mx-auto max-w-3xl">
+          <Alert variant="destructive">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+          <div className="mt-4 text-center">
+            <Button onClick={() => window.location.reload()}>Retry</Button>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -123,35 +289,44 @@ export default function BookingPage() {
             {/* Barber Selection */}
             <div>
               <h3 className="mb-4 text-lg font-medium">1. Choose Your Barber</h3>
-              <div className="grid gap-4">
-                {barbers.map((barber) => (
-                  <div key={barber.id} className="relative">
-                    <input
-                      type="radio"
-                      id={`barber-${barber.id}`}
-                      name="barber"
-                      value={barber.id}
-                      checked={selectedBarber === barber.id}
-                      onChange={() => setSelectedBarber(barber.id)}
-                      className="peer sr-only"
-                    />
-                    <label
-                      htmlFor={`barber-${barber.id}`}
-                      className="flex cursor-pointer items-start gap-4 rounded-lg border p-4 hover:bg-muted peer-checked:border-primary"
-                    >
-                      <img
-                        src={barber.image || "/placeholder.svg"}
-                        alt={barber.name}
-                        className="h-16 w-16 rounded-full object-cover"
+              {isLoadingBarbers ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="h-6 w-6 animate-spin" />
+                  <span className="ml-2">Loading barbers...</span>
+                </div>
+              ) : (
+                <div className="grid gap-4">
+                  {barbers.map((barber) => (
+                    <div key={barber.id} className="relative">
+                      <input
+                        type="radio"
+                        id={`barber-${barber.id}`}
+                        name="barber"
+                        value={barber.id}
+                        checked={selectedBarber === barber.id}
+                        onChange={() => handleBarberChange(barber.id)}
+                        className="peer sr-only"
                       />
-                      <div>
-                        <h3 className="font-medium">{barber.name}</h3>
-                        <p className="text-sm text-muted-foreground">Specialties: {barber.specialties.join(", ")}</p>
-                      </div>
-                    </label>
-                  </div>
-                ))}
-              </div>
+                      <label
+                        htmlFor={`barber-${barber.id}`}
+                        className="flex cursor-pointer items-start gap-4 rounded-lg border p-4 hover:bg-muted peer-checked:border-primary"
+                      >
+                        <img
+                          src={barber.image || "/placeholder.svg?height=100&width=100"}
+                          alt={barber.name}
+                          className="h-16 w-16 rounded-full object-cover"
+                        />
+                        <div>
+                          <h3 className="font-medium">{barber.name}</h3>
+                          <p className="text-sm text-muted-foreground">
+                            {barber.specialties ? `Specialties: ${barber.specialties.join(", ")}` : "Professional Barber"}
+                          </p>
+                        </div>
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             <Separator />
@@ -160,34 +335,51 @@ export default function BookingPage() {
             <div>
               <h3 className="mb-4 text-lg font-medium">2. Select Services</h3>
               <p className="mb-4 text-sm text-muted-foreground">Choose one or more services</p>
-              <div className="grid gap-3">
-                {services.map((service) => (
-                  <div key={service.id} className="relative">
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id={`service-${service.id}`}
-                        checked={selectedServices.includes(service.id)}
-                        onCheckedChange={() => handleServiceToggle(service.id)}
-                      />
-                      <label
-                        htmlFor={`service-${service.id}`}
-                        className="flex w-full cursor-pointer items-center justify-between rounded-lg p-2 hover:bg-muted"
-                      >
-                        <div>
-                          <span className="font-medium">{service.name}</span>
-                          <p className="text-xs text-muted-foreground">Duration: {service.duration}</p>
-                        </div>
-                        <span className="font-medium">Rp {service.price.toLocaleString()}</span>
-                      </label>
+              {isLoadingServices ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="h-6 w-6 animate-spin" />
+                  <span className="ml-2">Loading services...</span>
+                </div>
+              ) : (
+                <div className="grid gap-3">
+                  {services.map((service) => (
+                    <div key={service.id} className="relative">
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id={`service-${service.id}`}
+                          checked={selectedServices.includes(service.id)}
+                          onCheckedChange={() => handleServiceToggle(service.id)}
+                        />
+                        <label
+                          htmlFor={`service-${service.id}`}
+                          className="flex w-full cursor-pointer items-center justify-between rounded-lg p-2 hover:bg-muted"
+                        >
+                          <div>
+                            <span className="font-medium">{service.name}</span>
+                            {service.duration && (
+                              <p className="text-xs text-muted-foreground">Duration: {service.duration} min</p>
+                            )}
+                          </div>
+                          <span className="font-medium">Rp {service.price.toLocaleString()}</span>
+                        </label>
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
 
               {selectedServices.length > 0 && (
-                <div className="mt-4 flex items-center justify-between rounded-lg bg-muted p-3">
-                  <span className="font-medium">Total:</span>
-                  <span className="font-bold">Rp {totalPrice.toLocaleString()}</span>
+                <div className="mt-4 space-y-2">
+                  <div className="flex items-center justify-between rounded-lg bg-muted p-3">
+                    <span className="font-medium">Total Price:</span>
+                    <span className="font-bold">Rp {totalPrice.toLocaleString()}</span>
+                  </div>
+                  {totalDuration > 0 && (
+                    <div className="flex items-center justify-between rounded-lg bg-muted p-3">
+                      <span className="font-medium">Total Duration:</span>
+                      <span className="font-bold">{totalDuration} minutes</span>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -225,7 +417,7 @@ export default function BookingPage() {
                       <Calendar
                         mode="single"
                         selected={selectedDate}
-                        onSelect={setSelectedDate}
+                        onSelect={handleDateChange}
                         initialFocus
                         disabled={(date) => {
                           // Disable past dates and Sundays
@@ -240,21 +432,32 @@ export default function BookingPage() {
 
                 <div>
                   <h4 className="mb-2 font-medium">Select Time</h4>
-                  <ScrollArea className="h-[200px] rounded-md border p-4">
-                    <div className="grid grid-cols-3 gap-2">
-                      {timeSlots.map((time) => (
-                        <Button
-                          key={time}
-                          variant={selectedTime === time ? "default" : "outline"}
-                          className="flex items-center gap-1"
-                          onClick={() => setSelectedTime(time)}
-                        >
-                          <Clock className="h-3 w-3" />
-                          <span>{time}</span>
-                        </Button>
-                      ))}
+                  {!selectedBarber || !selectedDate ? (
+                    <p className="text-sm text-muted-foreground">Please select a barber and date first</p>
+                  ) : isLoadingSlots ? (
+                    <div className="flex items-center justify-center py-8">
+                      <Loader2 className="h-6 w-6 animate-spin" />
+                      <span className="ml-2">Loading available times...</span>
                     </div>
-                  </ScrollArea>
+                  ) : availableSlots.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">No available time slots for the selected date</p>
+                  ) : (
+                    <ScrollArea className="h-[200px] rounded-md border p-4">
+                      <div className="grid grid-cols-3 gap-2">
+                        {availableSlots.map((slot) => (
+                          <Button
+                            key={slot.time}
+                            variant={selectedTime === slot.time ? "default" : "outline"}
+                            className="flex items-center gap-1"
+                            onClick={() => setSelectedTime(slot.time)}
+                          >
+                            <Clock className="h-3 w-3" />
+                            <span>{slot.display}</span>
+                          </Button>
+                        ))}
+                      </div>
+                    </ScrollArea>
+                  )}
                 </div>
               </div>
             </div>
@@ -300,13 +503,23 @@ export default function BookingPage() {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Time:</span>
-                    <span className="font-medium">{selectedTime || "Not selected"}</span>
+                    <span className="font-medium">
+                      {selectedTime ? availableSlots.find(slot => slot.time === selectedTime)?.display : "Not selected"}
+                    </span>
                   </div>
                   {selectedServices.length > 0 && (
-                    <div className="flex justify-between border-t pt-2">
-                      <span className="font-medium">Total Price:</span>
-                      <span className="font-bold">Rp {totalPrice.toLocaleString()}</span>
-                    </div>
+                    <>
+                      {totalDuration > 0 && (
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Duration:</span>
+                          <span className="font-medium">{totalDuration} minutes</span>
+                        </div>
+                      )}
+                      <div className="flex justify-between border-t pt-2">
+                        <span className="font-medium">Total Price:</span>
+                        <span className="font-bold">Rp {totalPrice.toLocaleString()}</span>
+                      </div>
+                    </>
                   )}
                 </div>
               </div>
@@ -326,8 +539,15 @@ export default function BookingPage() {
                 <ChevronLeft className="mr-2 h-4 w-4" /> Back to Home
               </Button>
             </Link>
-            <Button onClick={handleConfirm} disabled={!isFormValid() || isLoading}>
-              {isLoading ? "Processing..." : "Confirm Booking"}
+            <Button onClick={handleConfirm} disabled={!isFormValid() || isSubmitting}>
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Processing...
+                </>
+              ) : (
+                "Confirm Booking"
+              )}
             </Button>
           </CardFooter>
         </Card>
