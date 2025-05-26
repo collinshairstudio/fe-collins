@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { CalendarIcon, ChevronLeft, Clock, Loader2 } from "lucide-react"
+import { CalendarIcon, ChevronLeft, Clock, Loader2, MapPin } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
@@ -21,12 +21,18 @@ const API_BASE_URL = "https://be-collins.vercel.app/api/bookings"
 const CREATE_BOOKING_URL = "https://be-collins.vercel.app/api/bookings"
 
 // Types
+interface Branch {
+  id: number
+  branch_name: string
+}
+
 interface Barber {
   id: number
   name: string
   created_at: string
   image?: string
   specialties?: string[]
+  branch_id?: number
 }
 
 interface Service {
@@ -35,6 +41,7 @@ interface Service {
   price: number
   duration: number | null
   created_at: string
+  branch_id?: number
 }
 
 interface TimeSlot {
@@ -50,100 +57,138 @@ interface AvailableSchedule {
 
 export default function BookingPage() {
   const router = useRouter()
-  
+
   // State for form data
+  const [selectedBranch, setSelectedBranch] = useState<number | null>(null)
   const [selectedBarber, setSelectedBarber] = useState<number | null>(null)
   const [selectedServices, setSelectedServices] = useState<number[]>([])
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined)
   const [selectedTime, setSelectedTime] = useState<string | null>(null)
-  
+
   // State for API data
+  const [branches, setBranches] = useState<Branch[]>([])
   const [barbers, setBarbers] = useState<Barber[]>([])
   const [services, setServices] = useState<Service[]>([])
   const [availableSlots, setAvailableSlots] = useState<TimeSlot[]>([])
-  
+
   // Loading states
-  const [isLoadingBarbers, setIsLoadingBarbers] = useState(true)
-  const [isLoadingServices, setIsLoadingServices] = useState(true)
+  const [isLoadingBranches, setIsLoadingBranches] = useState(true)
+  const [isLoadingBarbers, setIsLoadingBarbers] = useState(false)
+  const [isLoadingServices, setIsLoadingServices] = useState(false)
   const [isLoadingSlots, setIsLoadingSlots] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  
+
   // Error states
   const [error, setError] = useState<string | null>(null)
 
-  // Fetch barbers on component mount
+  // Fetch branches on component mount
   useEffect(() => {
-    fetchBarbers()
-    fetchServices()
+    fetchBranches()
   }, [])
+
+  // Fetch barbers and services when branch is selected
+  useEffect(() => {
+    if (selectedBranch) {
+      fetchBarbers()
+      fetchServices()
+    } else {
+      setBarbers([])
+      setServices([])
+      setSelectedBarber(null)
+      setSelectedServices([])
+    }
+  }, [selectedBranch])
 
   // Fetch available slots when barber and date are selected
   useEffect(() => {
-    if (selectedBarber && selectedDate) {
+    if (selectedBarber && selectedDate && selectedBranch) {
       fetchAvailableSlots()
     } else {
       setAvailableSlots([])
       setSelectedTime(null)
     }
-  }, [selectedBarber, selectedDate])
+  }, [selectedBarber, selectedDate, selectedBranch])
+
+  const fetchBranches = async () => {
+    try {
+      setIsLoadingBranches(true)
+      const response = await fetch(`${API_BASE_URL}/branches`)
+      const data = await response.json()
+
+      if (data.success) {
+        setBranches(data.data)
+      } else {
+        throw new Error("Failed to fetch branches")
+      }
+    } catch (error) {
+      console.error("Error fetching branches:", error)
+      setError("Failed to load branches. Please try again.")
+    } finally {
+      setIsLoadingBranches(false)
+    }
+  }
 
   const fetchBarbers = async () => {
+    if (!selectedBranch) return
+
     try {
       setIsLoadingBarbers(true)
-      const response = await fetch(`${API_BASE_URL}/capsters`)
+      const response = await fetch(`${API_BASE_URL}/branches/${selectedBranch}/capsters`)
       const data = await response.json()
-      
+
       if (data.success) {
         setBarbers(data.data)
       } else {
-        throw new Error('Failed to fetch barbers')
+        throw new Error("Failed to fetch barbers")
       }
     } catch (error) {
-      console.error('Error fetching barbers:', error)
-      setError('Failed to load barbers. Please try again.')
+      console.error("Error fetching barbers:", error)
+      setError("Failed to load barbers. Please try again.")
     } finally {
       setIsLoadingBarbers(false)
     }
   }
 
   const fetchServices = async () => {
+    if (!selectedBranch) return
+
     try {
       setIsLoadingServices(true)
-      const response = await fetch(`${API_BASE_URL}/services`)
+      const response = await fetch(`${API_BASE_URL}/branches/${selectedBranch}/services`)
       const data = await response.json()
-      
+
       if (data.success) {
         setServices(data.data)
       } else {
-        throw new Error('Failed to fetch services')
+        throw new Error("Failed to fetch services")
       }
     } catch (error) {
-      console.error('Error fetching services:', error)
-      setError('Failed to load services. Please try again.')
+      console.error("Error fetching services:", error)
+      setError("Failed to load services. Please try again.")
     } finally {
       setIsLoadingServices(false)
     }
   }
 
   const fetchAvailableSlots = async () => {
-    if (!selectedBarber || !selectedDate) return
-    
+    if (!selectedBarber || !selectedDate || !selectedBranch) return
+
     try {
       setIsLoadingSlots(true)
       // Format tanggal ke YYYY-MM-DD dengan memperhatikan timezone lokal
       const dateStr = formatLocalDate(selectedDate)
       const response = await fetch(
-        `${API_BASE_URL}/available-schedules?capster_id=${selectedBarber}&date=${dateStr}`
+        `${API_BASE_URL}/available-schedules?capster_id=${selectedBarber}&date=${dateStr}&branch_id=${selectedBranch}`,
       )
       const data = await response.json()
-      
+
       if (data.success) {
         setAvailableSlots(data.data.available_slots || [])
       } else {
-        throw new Error('Failed to fetch available slots')
+        throw new Error("Failed to fetch available slots")
       }
     } catch (error) {
-      console.error('Error fetching available slots:', error)
+      console.error("Error fetching available slots:", error)
       setAvailableSlots([])
       toast({
         title: "Error",
@@ -158,8 +203,8 @@ export default function BookingPage() {
   // Fungsi untuk memformat tanggal ke YYYY-MM-DD sesuai timezone lokal
   const formatLocalDate = (date: Date): string => {
     const year = date.getFullYear()
-    const month = String(date.getMonth() + 1).padStart(2, '0')
-    const day = String(date.getDate()).padStart(2, '0')
+    const month = String(date.getMonth() + 1).padStart(2, "0")
+    const day = String(date.getDate()).padStart(2, "0")
     return `${year}-${month}-${day}`
   }
 
@@ -174,6 +219,15 @@ export default function BookingPage() {
     const service = services.find((s) => s.id === serviceId)
     return sum + (service?.duration || 0)
   }, 0)
+
+  const handleBranchChange = (branchId: number) => {
+    setSelectedBranch(branchId)
+    // Reset all subsequent selections when branch changes
+    setSelectedBarber(null)
+    setSelectedServices([])
+    setSelectedDate(undefined)
+    setSelectedTime(null)
+  }
 
   const handleServiceToggle = (serviceId: number) => {
     setSelectedServices((prev) => {
@@ -198,7 +252,7 @@ export default function BookingPage() {
   }
 
   const handleConfirm = async () => {
-    if (!selectedBarber || selectedServices.length === 0 || !selectedDate || !selectedTime) {
+    if (!selectedBranch || !selectedBarber || selectedServices.length === 0 || !selectedDate || !selectedTime) {
       toast({
         title: "Incomplete Information",
         description: "Please fill in all required fields before confirming your booking.",
@@ -207,27 +261,25 @@ export default function BookingPage() {
       return
     }
 
-    // Get user_id from localStorage or authentication context
-    const userId = localStorage.getItem('user_id') || 'default-user-uuid' // Replace with actual user management
-
     const bookingData = {
+      branch_id: selectedBranch,
       capster_id: selectedBarber,
       service_ids: selectedServices,
-      date: formatLocalDate(selectedDate), // Gunakan formatLocalDate
-      time: selectedTime
+      date: formatLocalDate(selectedDate),
+      time: selectedTime,
     }
 
     try {
       setIsSubmitting(true)
-      
-      const token = localStorage.getItem('token')
+
+      const token = localStorage.getItem("token")
       const response = await fetch(CREATE_BOOKING_URL, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          ...(token && { 'Authorization': `Bearer ${token}` }),
+          "Content-Type": "application/json",
+          ...(token && { Authorization: `Bearer ${token}` }),
         },
-        body: JSON.stringify(bookingData)
+        body: JSON.stringify(bookingData),
       })
 
       const result = await response.json()
@@ -239,13 +291,13 @@ export default function BookingPage() {
         })
         router.push("/booking/success")
       } else {
-        throw new Error(result.error?.message || 'Failed to create booking')
+        throw new Error(result.error?.message || "Failed to create booking")
       }
     } catch (error) {
-      console.error('Error creating booking:', error)
+      console.error("Error creating booking:", error)
       toast({
         title: "Booking Failed",
-        description: (error instanceof Error ? error.message : "Failed to create booking. Please try again."),
+        description: error instanceof Error ? error.message : "Failed to create booking. Please try again.",
         variant: "destructive",
       })
     } finally {
@@ -254,10 +306,10 @@ export default function BookingPage() {
   }
 
   const isFormValid = () => {
-    return selectedBarber && selectedServices.length > 0 && selectedDate && selectedTime
+    return selectedBranch && selectedBarber && selectedServices.length > 0 && selectedDate && selectedTime
   }
 
-  if (error && (isLoadingBarbers || isLoadingServices)) {
+  if (error && isLoadingBranches) {
     return (
       <div className="container py-12">
         <div className="mx-auto max-w-3xl">
@@ -286,41 +338,37 @@ export default function BookingPage() {
             <CardDescription>Complete all sections to confirm your appointment</CardDescription>
           </CardHeader>
           <CardContent className="space-y-8">
-            {/* Barber Selection */}
+            {/* Branch Selection */}
             <div>
-              <h3 className="mb-4 text-lg font-medium">1. Choose Your Barber</h3>
-              {isLoadingBarbers ? (
+              <h3 className="mb-4 text-lg font-medium">1. Choose Branch Location</h3>
+              {isLoadingBranches ? (
                 <div className="flex items-center justify-center py-8">
                   <Loader2 className="h-6 w-6 animate-spin" />
-                  <span className="ml-2">Loading barbers...</span>
+                  <span className="ml-2">Loading branches...</span>
                 </div>
               ) : (
                 <div className="grid gap-4">
-                  {barbers.map((barber) => (
-                    <div key={barber.id} className="relative">
+                  {branches.map((branch) => (
+                    <div key={branch.id} className="relative">
                       <input
                         type="radio"
-                        id={`barber-${barber.id}`}
-                        name="barber"
-                        value={barber.id}
-                        checked={selectedBarber === barber.id}
-                        onChange={() => handleBarberChange(barber.id)}
+                        id={`branch-${branch.id}`}
+                        name="branch"
+                        value={branch.id}
+                        checked={selectedBranch === branch.id}
+                        onChange={() => handleBranchChange(branch.id)}
                         className="peer sr-only"
                       />
                       <label
-                        htmlFor={`barber-${barber.id}`}
+                        htmlFor={`branch-${branch.id}`}
                         className="flex cursor-pointer items-start gap-4 rounded-lg border p-4 hover:bg-muted peer-checked:border-primary"
                       >
-                        <img
-                          src={barber.image || "/placeholder.svg?height=100&width=100"}
-                          alt={barber.name}
-                          className="h-16 w-16 rounded-full object-cover"
-                        />
-                        <div>
-                          <h3 className="font-medium">{barber.name}</h3>
-                          <p className="text-sm text-muted-foreground">
-                            {barber.specialties ? `Specialties: ${barber.specialties.join(", ")}` : "Professional Barber"}
-                          </p>
+                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+                          <MapPin className="h-6 w-6 text-primary" />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="font-medium">{branch.branch_name}</h3>
+                          <p className="text-sm text-muted-foreground">Professional barbershop location</p>
                         </div>
                       </label>
                     </div>
@@ -329,209 +377,272 @@ export default function BookingPage() {
               )}
             </div>
 
-            <Separator />
+            {selectedBranch && (
+              <>
+                <Separator />
 
-            {/* Service Selection */}
-            <div>
-              <h3 className="mb-4 text-lg font-medium">2. Select Services</h3>
-              <p className="mb-4 text-sm text-muted-foreground">Choose one or more services</p>
-              {isLoadingServices ? (
-                <div className="flex items-center justify-center py-8">
-                  <Loader2 className="h-6 w-6 animate-spin" />
-                  <span className="ml-2">Loading services...</span>
-                </div>
-              ) : (
-                <div className="grid gap-3">
-                  {services.map((service) => (
-                    <div key={service.id} className="relative">
-                      <div className="flex items-center space-x-2">
-                        <Checkbox
-                          id={`service-${service.id}`}
-                          checked={selectedServices.includes(service.id)}
-                          onCheckedChange={() => handleServiceToggle(service.id)}
-                        />
-                        <label
-                          htmlFor={`service-${service.id}`}
-                          className="flex w-full cursor-pointer items-center justify-between rounded-lg p-2 hover:bg-muted"
-                        >
-                          <div>
-                            <span className="font-medium">{service.name}</span>
-                            {service.duration && (
-                              <p className="text-xs text-muted-foreground">Duration: {service.duration} min</p>
-                            )}
-                          </div>
-                          <span className="font-medium">Rp {service.price.toLocaleString()}</span>
-                        </label>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {selectedServices.length > 0 && (
-                <div className="mt-4 space-y-2">
-                  <div className="flex items-center justify-between rounded-lg bg-muted p-3">
-                    <span className="font-medium">Total Price:</span>
-                    <span className="font-bold">Rp {totalPrice.toLocaleString()}</span>
-                  </div>
-                  {totalDuration > 0 && (
-                    <div className="flex items-center justify-between rounded-lg bg-muted p-3">
-                      <span className="font-medium">Total Duration:</span>
-                      <span className="font-bold">{totalDuration} minutes</span>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-
-            <Separator />
-
-            {/* Date & Time Selection */}
-            <div>
-              <h3 className="mb-4 text-lg font-medium">3. Pick a Date & Time</h3>
-              <div className="space-y-4">
+                {/* Barber Selection */}
                 <div>
-                  <h4 className="mb-2 font-medium">Select Date</h4>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className={cn(
-                          "w-full justify-start text-left font-normal",
-                          !selectedDate && "text-muted-foreground",
-                        )}
-                      >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {selectedDate ? (
-                          selectedDate.toLocaleDateString("en-US", {
-                            weekday: "long",
-                            month: "long",
-                            day: "numeric",
-                          })
-                        ) : (
-                          <span>Pick a date</span>
-                        )}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0">
-                      <Calendar
-                        mode="single"
-                        selected={selectedDate}
-                        onSelect={handleDateChange}
-                        initialFocus
-                        disabled={(date) => {
-                          // Disable past dates and Sundays
-                          const today = new Date()
-                          today.setHours(0, 0, 0, 0)
-                          return date < today || date.getDay() === 0
-                        }}
-                      />
-                    </PopoverContent>
-                  </Popover>
-                </div>
-
-                <div>
-                  <h4 className="mb-2 font-medium">Select Time</h4>
-                  {!selectedBarber || !selectedDate ? (
-                    <p className="text-sm text-muted-foreground">Please select a barber and date first</p>
-                  ) : isLoadingSlots ? (
+                  <h3 className="mb-4 text-lg font-medium">2. Choose Your Barber</h3>
+                  {isLoadingBarbers ? (
                     <div className="flex items-center justify-center py-8">
                       <Loader2 className="h-6 w-6 animate-spin" />
-                      <span className="ml-2">Loading available times...</span>
+                      <span className="ml-2">Loading barbers...</span>
                     </div>
-                  ) : availableSlots.length === 0 ? (
-                    <p className="text-sm text-muted-foreground">No available time slots for the selected date</p>
+                  ) : barbers.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">No barbers available for the selected branch</p>
                   ) : (
-                    <ScrollArea className="h-[200px] rounded-md border p-4">
-                      <div className="grid grid-cols-3 gap-2">
-                        {availableSlots.map((slot) => (
-                          <Button
-                            key={slot.time}
-                            variant={selectedTime === slot.time ? "default" : "outline"}
-                            className="flex items-center gap-1"
-                            onClick={() => setSelectedTime(slot.time)}
+                    <div className="grid gap-4">
+                      {barbers.map((barber) => (
+                        <div key={barber.id} className="relative">
+                          <input
+                            type="radio"
+                            id={`barber-${barber.id}`}
+                            name="barber"
+                            value={barber.id}
+                            checked={selectedBarber === barber.id}
+                            onChange={() => handleBarberChange(barber.id)}
+                            className="peer sr-only"
+                          />
+                          <label
+                            htmlFor={`barber-${barber.id}`}
+                            className="flex cursor-pointer items-start gap-4 rounded-lg border p-4 hover:bg-muted peer-checked:border-primary"
                           >
-                            <Clock className="h-3 w-3" />
-                            <span>{slot.display}</span>
-                          </Button>
-                        ))}
-                      </div>
-                    </ScrollArea>
+                            <img
+                              src={barber.image || "/placeholder.svg?height=100&width=100"}
+                              alt={barber.name}
+                              className="h-16 w-16 rounded-full object-cover"
+                            />
+                            <div>
+                              <h3 className="font-medium">{barber.name}</h3>
+                              <p className="text-sm text-muted-foreground">
+                                {barber.specialties
+                                  ? `Specialties: ${barber.specialties.join(", ")}`
+                                  : "Professional Barber"}
+                              </p>
+                            </div>
+                          </label>
+                        </div>
+                      ))}
+                    </div>
                   )}
                 </div>
-              </div>
-            </div>
 
-            <Separator />
+                <Separator />
 
-            {/* Summary */}
-            <div>
-              <h3 className="mb-4 text-lg font-medium">4. Booking Summary</h3>
-              <div className="rounded-lg border p-4">
-                <div className="space-y-3">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Barber:</span>
-                    <span className="font-medium">
-                      {selectedBarber ? barbers.find((b) => b.id === selectedBarber)?.name : "Not selected"}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Services:</span>
-                    <div className="flex flex-col items-end">
-                      {selectedServices.length > 0 ? (
-                        selectedServices.map((serviceId) => (
-                          <span key={serviceId} className="font-medium">
-                            {services.find((s) => s.id === serviceId)?.name}
-                          </span>
-                        ))
-                      ) : (
-                        <span>Not selected</span>
-                      )}
+                {/* Service Selection */}
+                <div>
+                  <h3 className="mb-4 text-lg font-medium">3. Select Services</h3>
+                  <p className="mb-4 text-sm text-muted-foreground">Choose one or more services</p>
+                  {isLoadingServices ? (
+                    <div className="flex items-center justify-center py-8">
+                      <Loader2 className="h-6 w-6 animate-spin" />
+                      <span className="ml-2">Loading services...</span>
                     </div>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Date:</span>
-                    <span className="font-medium">
-                      {selectedDate
-                        ? selectedDate.toLocaleDateString("en-US", {
-                            weekday: "long",
-                            month: "long",
-                            day: "numeric",
-                          })
-                        : "Not selected"}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Time:</span>
-                    <span className="font-medium">
-                      {selectedTime ? availableSlots.find(slot => slot.time === selectedTime)?.display : "Not selected"}
-                    </span>
-                  </div>
-                  {selectedServices.length > 0 && (
-                    <>
-                      {totalDuration > 0 && (
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">Duration:</span>
-                          <span className="font-medium">{totalDuration} minutes</span>
+                  ) : services.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">No services available for the selected branch</p>
+                  ) : (
+                    <div className="grid gap-3">
+                      {services.map((service) => (
+                        <div key={service.id} className="relative">
+                          <div className="flex items-center space-x-2">
+                            <Checkbox
+                              id={`service-${service.id}`}
+                              checked={selectedServices.includes(service.id)}
+                              onCheckedChange={() => handleServiceToggle(service.id)}
+                            />
+                            <label
+                              htmlFor={`service-${service.id}`}
+                              className="flex w-full cursor-pointer items-center justify-between rounded-lg p-2 hover:bg-muted"
+                            >
+                              <div>
+                                <span className="font-medium">{service.name}</span>
+                                {service.duration && (
+                                  <p className="text-xs text-muted-foreground">Duration: {service.duration} min</p>
+                                )}
+                              </div>
+                              <span className="font-medium">Rp {service.price.toLocaleString()}</span>
+                            </label>
+                          </div>
                         </div>
-                      )}
-                      <div className="flex justify-between border-t pt-2">
+                      ))}
+                    </div>
+                  )}
+
+                  {selectedServices.length > 0 && (
+                    <div className="mt-4 space-y-2">
+                      <div className="flex items-center justify-between rounded-lg bg-muted p-3">
                         <span className="font-medium">Total Price:</span>
                         <span className="font-bold">Rp {totalPrice.toLocaleString()}</span>
                       </div>
-                    </>
+                      {totalDuration > 0 && (
+                        <div className="flex items-center justify-between rounded-lg bg-muted p-3">
+                          <span className="font-medium">Total Duration:</span>
+                          <span className="font-bold">{totalDuration} minutes</span>
+                        </div>
+                      )}
+                    </div>
                   )}
                 </div>
-              </div>
 
-              <div className="mt-4 rounded-lg border p-4">
-                <h4 className="font-medium">Cancellation Policy</h4>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  You can cancel or reschedule your appointment up to 24 hours before your scheduled time without any
-                  charges. Late cancellations or no-shows may incur a fee.
-                </p>
-              </div>
-            </div>
+                <Separator />
+
+                {/* Date & Time Selection */}
+                <div>
+                  <h3 className="mb-4 text-lg font-medium">4. Pick a Date & Time</h3>
+                  <div className="space-y-4">
+                    <div>
+                      <h4 className="mb-2 font-medium">Select Date</h4>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            className={cn(
+                              "w-full justify-start text-left font-normal",
+                              !selectedDate && "text-muted-foreground",
+                            )}
+                          >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {selectedDate ? (
+                              selectedDate.toLocaleDateString("en-US", {
+                                weekday: "long",
+                                month: "long",
+                                day: "numeric",
+                              })
+                            ) : (
+                              <span>Pick a date</span>
+                            )}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0">
+                          <Calendar
+                            mode="single"
+                            selected={selectedDate}
+                            onSelect={handleDateChange}
+                            initialFocus
+                            disabled={(date) => {
+                              // Disable past dates and Sundays
+                              const today = new Date()
+                              today.setHours(0, 0, 0, 0)
+                              return date < today || date.getDay() === 0
+                            }}
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+
+                    <div>
+                      <h4 className="mb-2 font-medium">Select Time</h4>
+                      {!selectedBarber || !selectedDate ? (
+                        <p className="text-sm text-muted-foreground">Please select a barber and date first</p>
+                      ) : isLoadingSlots ? (
+                        <div className="flex items-center justify-center py-8">
+                          <Loader2 className="h-6 w-6 animate-spin" />
+                          <span className="ml-2">Loading available times...</span>
+                        </div>
+                      ) : availableSlots.length === 0 ? (
+                        <p className="text-sm text-muted-foreground">No available time slots for the selected date</p>
+                      ) : (
+                        <ScrollArea className="h-[200px] rounded-md border p-4">
+                          <div className="grid grid-cols-3 gap-2">
+                            {availableSlots.map((slot) => (
+                              <Button
+                                key={slot.time}
+                                variant={selectedTime === slot.time ? "default" : "outline"}
+                                className="flex items-center gap-1"
+                                onClick={() => setSelectedTime(slot.time)}
+                              >
+                                <Clock className="h-3 w-3" />
+                                <span>{slot.display}</span>
+                              </Button>
+                            ))}
+                          </div>
+                        </ScrollArea>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <Separator />
+
+                {/* Summary */}
+                <div>
+                  <h3 className="mb-4 text-lg font-medium">5. Booking Summary</h3>
+                  <div className="rounded-lg border p-4">
+                    <div className="space-y-3">
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Branch:</span>
+                        <span className="font-medium">
+                          {selectedBranch ? branches.find((b) => b.id === selectedBranch)?.branch_name : "Not selected"}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Barber:</span>
+                        <span className="font-medium">
+                          {selectedBarber ? barbers.find((b) => b.id === selectedBarber)?.name : "Not selected"}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Services:</span>
+                        <div className="flex flex-col items-end">
+                          {selectedServices.length > 0 ? (
+                            selectedServices.map((serviceId) => (
+                              <span key={serviceId} className="font-medium">
+                                {services.find((s) => s.id === serviceId)?.name}
+                              </span>
+                            ))
+                          ) : (
+                            <span>Not selected</span>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Date:</span>
+                        <span className="font-medium">
+                          {selectedDate
+                            ? selectedDate.toLocaleDateString("en-US", {
+                                weekday: "long",
+                                month: "long",
+                                day: "numeric",
+                              })
+                            : "Not selected"}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Time:</span>
+                        <span className="font-medium">
+                          {selectedTime
+                            ? availableSlots.find((slot) => slot.time === selectedTime)?.display
+                            : "Not selected"}
+                        </span>
+                      </div>
+                      {selectedServices.length > 0 && (
+                        <>
+                          {totalDuration > 0 && (
+                            <div className="flex justify-between">
+                              <span className="text-muted-foreground">Duration:</span>
+                              <span className="font-medium">{totalDuration} minutes</span>
+                            </div>
+                          )}
+                          <div className="flex justify-between border-t pt-2">
+                            <span className="font-medium">Total Price:</span>
+                            <span className="font-bold">Rp {totalPrice.toLocaleString()}</span>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="mt-4 rounded-lg border p-4">
+                    <h4 className="font-medium">Cancellation Policy</h4>
+                    <p className="mt-2 text-sm text-muted-foreground">
+                      You can cancel or reschedule your appointment up to 24 hours before your scheduled time without
+                      any charges. Late cancellations or no-shows may incur a fee.
+                    </p>
+                  </div>
+                </div>
+              </>
+            )}
           </CardContent>
           <CardFooter className="flex justify-between">
             <Link href="/">

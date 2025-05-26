@@ -3,10 +3,10 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { Calendar, Clock, Edit, MoreHorizontal, Plus, Scissors, User, AlertCircle } from "lucide-react"
+import { Calendar, Clock, Edit, MoreHorizontal, Plus, Scissors, User, AlertCircle, MapPin } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
@@ -15,28 +15,37 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
 type Booking = {
   id: number
+  user_id: string
+  capster_id: number
   schedule: string
-  status: 'confirmed' | 'completed' | 'cancelled'
-  barber: {
-    id: number
-    name: string
-    image?: string
-  }
-  service_id: number[] // Array of service IDs
-  services?: { // Optional array of service details
-    id: number
-    name: string
-    price?: number
-    duration?: number
-  }[]
-  total_price: number
+  created_at: string
+  status: "confirmed" | "completed" | "cancelled"
+  service_old: any
+  service_id: number[]
   total_duration: number
+  total_price: number
+  branch_id: number | null
+  barbers: {
+    id: number
+    name: string
+    image?: string | null
+  }
+  branch: {
+    id: number
+    branch_name: string
+  } | null
+  services: {
+    id: number
+    name: string
+    price: number
+    duration: number
+  }[]
 }
 
 const statusColors = {
-  confirmed: 'bg-blue-100 text-blue-800',
-  completed: 'bg-green-100 text-green-800',
-  cancelled: 'bg-gray-100 text-gray-800'
+  confirmed: "bg-blue-100 text-blue-800",
+  completed: "bg-green-100 text-green-800",
+  cancelled: "bg-gray-100 text-gray-800",
 }
 
 export default function DashboardPage() {
@@ -52,69 +61,61 @@ export default function DashboardPage() {
       try {
         setIsLoading(true)
         setError(null)
-        
-        const token = localStorage.getItem('token')
-        const userId = localStorage.getItem('userId')
-        
+
+        const token = localStorage.getItem("token")
+        const userId = localStorage.getItem("userId")
+
         if (!token || !userId) {
-          router.push('/login')
+          router.push("/login")
           return
         }
 
         const response = await fetch(`https://be-collins.vercel.app/api/bookings/by-user/${userId}`, {
           headers: {
-            'Authorization': `Bearer ${token}`
-          }
+            Authorization: `Bearer ${token}`,
+          },
         })
 
         if (response.status === 401) {
-          localStorage.removeItem('token')
-          localStorage.removeItem('userId')
-          router.push('/login')
+          localStorage.removeItem("token")
+          localStorage.removeItem("userId")
+          router.push("/login")
           return
         }
 
         if (!response.ok) {
-          throw new Error('Failed to fetch bookings')
+          throw new Error("Failed to fetch bookings")
         }
 
         const data = await response.json()
-        
+
         if (data.success) {
           const now = new Date()
-          
+
           const processBookings = (bookings: Booking[]) => {
-            return bookings.map(booking => ({
+            return bookings.map((booking) => ({
               ...booking,
               // Pastikan services selalu berupa array
-              services: booking.services || []
+              services: booking.services || [],
             }))
           }
 
           const upcoming = data.data
-            .filter((booking: Booking) => 
-              new Date(booking.schedule) >= now && booking.status === 'confirmed'
-            )
-            .sort((a: Booking, b: Booking) => 
-              new Date(a.schedule).getTime() - new Date(b.schedule).getTime()
-            )
-          
+            .filter((booking: Booking) => new Date(booking.schedule) >= now && booking.status === "confirmed")
+            .sort((a: Booking, b: Booking) => new Date(a.schedule).getTime() - new Date(b.schedule).getTime())
+
           const past = data.data
-            .filter((booking: Booking) => 
-              new Date(booking.schedule) < now || booking.status !== 'confirmed'
-            )
-            .sort((a: Booking, b: Booking) => 
-              new Date(b.schedule).getTime() - new Date(a.schedule).getTime()
-            )
+            .filter((booking: Booking) => new Date(booking.schedule) < now || booking.status !== "confirmed")
+            .sort((a: Booking, b: Booking) => new Date(b.schedule).getTime() - new Date(a.schedule).getTime())
 
           setUpcomingAppointments(processBookings(upcoming))
           setPastAppointments(processBookings(past))
         } else {
-          throw new Error(data.error?.message || 'Failed to fetch bookings')
+          throw new Error(data.error?.message || "Failed to fetch bookings")
         }
       } catch (err) {
-        console.error('Fetch bookings error:', err)
-        setError(err instanceof Error ? err.message : 'An unknown error occurred')
+        console.error("Fetch bookings error:", err)
+        setError(err instanceof Error ? err.message : "An unknown error occurred")
         toast({
           variant: "destructive",
           title: "Error",
@@ -133,15 +134,15 @@ export default function DashboardPage() {
     return date.toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
-      year: "numeric"
+      year: "numeric",
     })
   }
 
   const formatTime = (dateString: string) => {
     const date = new Date(dateString)
     return date.toLocaleTimeString("en-US", {
-      hour: '2-digit',
-      minute: '2-digit'
+      hour: "2-digit",
+      minute: "2-digit",
     })
   }
 
@@ -151,60 +152,72 @@ export default function DashboardPage() {
 
   const handleCancel = async (bookingId: number) => {
     try {
-      const token = localStorage.getItem('token')
-      const userId = localStorage.getItem('userId')
-      
+      const token = localStorage.getItem("token")
+      const userId = localStorage.getItem("userId")
+
       if (!token || !userId) {
-        router.push('/login')
+        router.push("/login")
         return
       }
 
       const response = await fetch(`https://be-collins.vercel.app/api/bookings/${bookingId}/cancel`, {
-        method: 'PUT',
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ userId })
+        body: JSON.stringify({ userId }),
       })
 
       if (!response.ok) {
-        throw new Error('Failed to cancel booking')
+        throw new Error("Failed to cancel booking")
       }
 
       const data = await response.json()
-      
+
       if (data.success) {
-        const cancelledBooking = upcomingAppointments.find(b => b.id === bookingId)
+        const cancelledBooking = upcomingAppointments.find((b) => b.id === bookingId)
         if (cancelledBooking) {
-          setUpcomingAppointments(upcomingAppointments.filter(b => b.id !== bookingId))
-          setPastAppointments([{
-            ...cancelledBooking,
-            status: 'cancelled'
-          }, ...pastAppointments])
+          setUpcomingAppointments(upcomingAppointments.filter((b) => b.id !== bookingId))
+          setPastAppointments([
+            {
+              ...cancelledBooking,
+              status: "cancelled",
+            },
+            ...pastAppointments,
+          ])
         }
-        
+
         toast({
           title: "Success",
           description: "Your booking has been cancelled.",
         })
       } else {
-        throw new Error(data.error?.message || 'Failed to cancel booking')
+        throw new Error(data.error?.message || "Failed to cancel booking")
       }
     } catch (err) {
-      console.error('Cancel booking error:', err)
+      console.error("Cancel booking error:", err)
       toast({
         variant: "destructive",
         title: "Error",
-        description: err instanceof Error ? err.message : 'Failed to cancel booking',
+        description: err instanceof Error ? err.message : "Failed to cancel booking",
       })
     }
   }
 
-  const handleBookAgain = (serviceIds: number[], barberId: number) => {
+  const handleBookAgain = (serviceIds: number[], barberId: number, branchId?: number | null) => {
     // Mengambil service pertama sebagai default
     const primaryServiceId = serviceIds[0]
-    router.push(`/booking?serviceId=${primaryServiceId}&barberId=${barberId}`)
+    const queryParams = new URLSearchParams({
+      serviceId: primaryServiceId.toString(),
+      barberId: barberId.toString(),
+    })
+
+    if (branchId) {
+      queryParams.append("branchId", branchId.toString())
+    }
+
+    router.push(`/booking?${queryParams.toString()}`)
   }
 
   if (isLoading) {
@@ -228,9 +241,7 @@ export default function DashboardPage() {
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
           <AlertTitle>Error</AlertTitle>
-          <AlertDescription>
-            {error}
-          </AlertDescription>
+          <AlertDescription>{error}</AlertDescription>
         </Alert>
         <Button onClick={() => window.location.reload()} className="mt-4">
           Try Again
@@ -260,7 +271,7 @@ export default function DashboardPage() {
           <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
           <TabsTrigger value="past">Past</TabsTrigger>
         </TabsList>
-        
+
         <TabsContent value="upcoming" className="mt-3">
           <Card>
             <CardHeader className="pb-3">
@@ -276,18 +287,24 @@ export default function DashboardPage() {
                         <div>
                           <div className="flex items-center gap-2">
                             <h3 className="font-medium">
-                              {appointment.services.length > 0 
-                                ? appointment.services.map(s => s.name).join(', ')
-                                : 'No service specified'}
+                              {appointment.services.length > 0
+                                ? appointment.services.map((s) => s.name).join(", ")
+                                : "No service specified"}
                             </h3>
                             <Badge variant="outline" className={statusColors[appointment.status]}>
                               {appointment.status}
                             </Badge>
                           </div>
                           <div className="mt-1.5 flex flex-wrap gap-2 text-xs text-muted-foreground">
+                            {appointment.branch && (
+                              <div className="flex items-center gap-1">
+                                <MapPin className="h-3.5 w-3.5" />
+                                <span>{appointment.branch.branch_name}</span>
+                              </div>
+                            )}
                             <div className="flex items-center gap-1">
                               <User className="h-3.5 w-3.5" />
-                              <span>{appointment.barber.name}</span>
+                              <span>{appointment.barbers.name}</span>
                             </div>
                             <div className="flex items-center gap-1">
                               <Calendar className="h-3.5 w-3.5" />
@@ -319,10 +336,7 @@ export default function DashboardPage() {
                               <Edit className="mr-2 h-4 w-4" />
                               Reschedule
                             </DropdownMenuItem>
-                            <DropdownMenuItem 
-                              className="text-destructive"
-                              onClick={() => handleCancel(appointment.id)}
-                            >
+                            <DropdownMenuItem className="text-destructive" onClick={() => handleCancel(appointment.id)}>
                               Cancel Appointment
                             </DropdownMenuItem>
                           </DropdownMenuContent>
@@ -344,7 +358,7 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
         </TabsContent>
-        
+
         <TabsContent value="past" className="mt-3">
           <Card>
             <CardHeader className="pb-3">
@@ -360,18 +374,24 @@ export default function DashboardPage() {
                         <div>
                           <div className="flex items-center gap-2">
                             <h3 className="font-medium">
-                              {appointment.services.length > 0 
-                                ? appointment.services.map(s => s.name).join(', ')
-                                : 'No service specified'}
+                              {appointment.services.length > 0
+                                ? appointment.services.map((s) => s.name).join(", ")
+                                : "No service specified"}
                             </h3>
                             <Badge variant="outline" className={statusColors[appointment.status]}>
                               {appointment.status}
                             </Badge>
                           </div>
                           <div className="mt-1.5 flex flex-wrap gap-2 text-xs text-muted-foreground">
+                            {appointment.branch && (
+                              <div className="flex items-center gap-1">
+                                <MapPin className="h-3.5 w-3.5" />
+                                <span>{appointment.branch.branch_name}</span>
+                              </div>
+                            )}
                             <div className="flex items-center gap-1">
                               <User className="h-3.5 w-3.5" />
-                              <span>{appointment.barber.name}</span>
+                              <span>{appointment.barbers.name}</span>
                             </div>
                             <div className="flex items-center gap-1">
                               <Calendar className="h-3.5 w-3.5" />
@@ -394,8 +414,10 @@ export default function DashboardPage() {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            <DropdownMenuItem 
-                              onClick={() => handleBookAgain(appointment.service_id, appointment.barber.id)}
+                            <DropdownMenuItem
+                              onClick={() =>
+                                handleBookAgain(appointment.service_id, appointment.barbers.id, appointment.branch_id)
+                              }
                             >
                               Book Again
                             </DropdownMenuItem>
