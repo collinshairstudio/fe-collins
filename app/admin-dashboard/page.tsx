@@ -1,16 +1,12 @@
 "use client"
 
 import { useState } from "react"
-import Link from "next/link"
 import {
   BarChart3,
   Calendar,
   DollarSign,
-  Home,
   LayoutDashboard,
   LineChart,
-  LogOut,
-  Menu,
   Package,
   Scissors,
   Settings,
@@ -23,9 +19,15 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Sheet, SheetContent } from "@/components/ui/sheet"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+
+import AppointmentsPage from "./appointments-page"
+import BarbersPage from "./barbers-page"
+import BranchPage from "./branch-page"
+import ClientsPage from "./clients-page"
+import ServicesPage from "./services-page"
+import ReportsPage from "./reports-page"
+import SettingsPage from "./settings-page"
 
 // Sample data
 const barbers = [
@@ -163,6 +165,7 @@ const recentAppointments = [
 
 export default function AdminDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [currentPage, setCurrentPage] = useState("dashboard")
 
   // Calculate total revenue
   const totalRevenue = barbers.reduce((sum, barber) => sum + barber.revenue, 0)
@@ -191,66 +194,71 @@ export default function AdminDashboard() {
         </div>
 
         <nav className="flex flex-col gap-1 flex-1">
-          <Link href="/admin-dashboard">
-            <Button variant="ghost" className="w-full justify-start h-9 px-3">
-              <LayoutDashboard className="mr-2 h-4 w-4" />
-              <span className="text-sm">Dashboard</span>
-            </Button>
-          </Link>
-          <Link href="/admin-dashboard/appointments">
-            <Button variant="ghost" className="w-full justify-start h-9 px-3">
-              <Calendar className="mr-2 h-4 w-4" />
-              <span className="text-sm">Appointments</span>
-            </Button>
-          </Link>
-          <Link href="/admin-dashboard/barbers">
-            <Button variant="ghost" className="w-full justify-start h-9 px-3">
-              <Users className="mr-2 h-4 w-4" />
-              <span className="text-sm">Barbers</span>
-            </Button>
-          </Link>
-          <Link href="/admin-dashboard/clients">
-            <Button variant="ghost" className="w-full justify-start h-9 px-3">
-              <User className="mr-2 h-4 w-4" />
-              <span className="text-sm">Clients</span>
-            </Button>
-          </Link>
-          <Link href="/admin-dashboard/services">
-            <Button variant="ghost" className="w-full justify-start h-9 px-3">
-              <Package className="mr-2 h-4 w-4" />
-              <span className="text-sm">Services</span>
-            </Button>
-          </Link>
-          <Link href="/admin-dashboard/reports">
-            <Button variant="ghost" className="w-full justify-start h-9 px-3">
-              <BarChart3 className="mr-2 h-4 w-4" />
-              <span className="text-sm">Reports</span>
-            </Button>
-          </Link>
-          <Link href="/admin-dashboard/settings">
-            <Button variant="ghost" className="w-full justify-start h-9 px-3">
-              <Settings className="mr-2 h-4 w-4" />
-              <span className="text-sm">Settings</span>
-            </Button>
-          </Link>
-        </nav>
-
-        <div className="mt-auto pt-4">
-          <Separator className="my-3" />
-          <Link href="/">
-            <Button variant="ghost" className="w-full justify-start h-9 px-3">
-              <Home className="mr-2 h-4 w-4" />
-              <span className="text-sm">Main Website</span>
-            </Button>
-          </Link>
           <Button
-            variant="ghost"
-            className="w-full justify-start h-9 px-3 text-red-500 hover:text-red-600 hover:bg-red-50"
+            variant={currentPage === "dashboard" ? "default" : "ghost"}
+            className="w-full justify-start h-9 px-3"
+            onClick={() => setCurrentPage("dashboard")}
           >
-            <LogOut className="mr-2 h-4 w-4" />
-            <span className="text-sm">Sign Out</span>
+            <LayoutDashboard className="mr-2 h-4 w-4" />
+            <span className="text-sm">Dashboard</span>
           </Button>
-        </div>
+          <Button
+            variant={currentPage === "appointments" ? "default" : "ghost"}
+            className="w-full justify-start h-9 px-3"
+            onClick={() => setCurrentPage("appointments")}
+          >
+            <Calendar className="mr-2 h-4 w-4" />
+            <span className="text-sm">Appointments</span>
+          </Button>
+          <Button
+            variant={currentPage === "barbers" ? "default" : "ghost"}
+            className="w-full justify-start h-9 px-3"
+            onClick={() => setCurrentPage("barbers")}
+          >
+            <Users className="mr-2 h-4 w-4" />
+            <span className="text-sm">Barbers</span>
+          </Button>
+          <Button
+            variant={currentPage === "branch" ? "default" : "ghost"}
+            className="w-full justify-start h-9 px-3"
+            onClick={() => setCurrentPage("branch")}
+          >
+            <Package className="mr-2 h-4 w-4" />
+            <span className="text-sm">Branch</span>
+          </Button>
+          <Button
+            variant={currentPage === "clients" ? "default" : "ghost"}
+            className="w-full justify-start h-9 px-3"
+            onClick={() => setCurrentPage("clients")}
+          >
+            <User className="mr-2 h-4 w-4" />
+            <span className="text-sm">Clients</span>
+          </Button>
+          <Button
+            variant={currentPage === "services" ? "default" : "ghost"}
+            className="w-full justify-start h-9 px-3"
+            onClick={() => setCurrentPage("services")}
+          >
+            <Package className="mr-2 h-4 w-4" />
+            <span className="text-sm">Services</span>
+          </Button>
+          <Button
+            variant={currentPage === "reports" ? "default" : "ghost"}
+            className="w-full justify-start h-9 px-3"
+            onClick={() => setCurrentPage("reports")}
+          >
+            <BarChart3 className="mr-2 h-4 w-4" />
+            <span className="text-sm">Reports</span>
+          </Button>
+          <Button
+            variant={currentPage === "settings" ? "default" : "ghost"}
+            className="w-full justify-start h-9 px-3"
+            onClick={() => setCurrentPage("settings")}
+          >
+            <Settings className="mr-2 h-4 w-4" />
+            <span className="text-sm">Settings</span>
+          </Button>
+        </nav>
       </aside>
 
       {/* Mobile sidebar */}
@@ -273,328 +281,342 @@ export default function AdminDashboard() {
           </div>
 
           <nav className="flex flex-col gap-1 flex-1">
-            <Link href="/admin-dashboard" onClick={() => setSidebarOpen(false)}>
-              <Button variant="ghost" className="w-full justify-start h-9 px-3">
-                <LayoutDashboard className="mr-2 h-4 w-4" />
-                <span className="text-sm">Dashboard</span>
-              </Button>
-            </Link>
-            <Link href="/admin-dashboard/appointments" onClick={() => setSidebarOpen(false)}>
-              <Button variant="ghost" className="w-full justify-start h-9 px-3">
-                <Calendar className="mr-2 h-4 w-4" />
-                <span className="text-sm">Appointments</span>
-              </Button>
-            </Link>
-            <Link href="/admin-dashboard/barbers" onClick={() => setSidebarOpen(false)}>
-              <Button variant="ghost" className="w-full justify-start h-9 px-3">
-                <Users className="mr-2 h-4 w-4" />
-                <span className="text-sm">Barbers</span>
-              </Button>
-            </Link>
-            <Link href="/admin-dashboard/clients" onClick={() => setSidebarOpen(false)}>
-              <Button variant="ghost" className="w-full justify-start h-9 px-3">
-                <User className="mr-2 h-4 w-4" />
-                <span className="text-sm">Clients</span>
-              </Button>
-            </Link>
-            <Link href="/admin-dashboard/services" onClick={() => setSidebarOpen(false)}>
-              <Button variant="ghost" className="w-full justify-start h-9 px-3">
-                <Package className="mr-2 h-4 w-4" />
-                <span className="text-sm">Services</span>
-              </Button>
-            </Link>
-            <Link href="/admin-dashboard/reports" onClick={() => setSidebarOpen(false)}>
-              <Button variant="ghost" className="w-full justify-start h-9 px-3">
-                <BarChart3 className="mr-2 h-4 w-4" />
-                <span className="text-sm">Reports</span>
-              </Button>
-            </Link>
-            <Link href="/admin-dashboard/settings" onClick={() => setSidebarOpen(false)}>
-              <Button variant="ghost" className="w-full justify-start h-9 px-3">
-                <Settings className="mr-2 h-4 w-4" />
-                <span className="text-sm">Settings</span>
-              </Button>
-            </Link>
-          </nav>
-
-          <div className="mt-auto pt-4">
-            <Separator className="my-3" />
-            <Link href="/" onClick={() => setSidebarOpen(false)}>
-              <Button variant="ghost" className="w-full justify-start h-9 px-3">
-                <Home className="mr-2 h-4 w-4" />
-                <span className="text-sm">Main Website</span>
-              </Button>
-            </Link>
             <Button
-              variant="ghost"
-              className="w-full justify-start h-9 px-3 text-red-500 hover:text-red-600 hover:bg-red-50"
+              variant={currentPage === "dashboard" ? "default" : "ghost"}
+              className="w-full justify-start h-9 px-3"
+              onClick={() => {
+                setCurrentPage("dashboard")
+                setSidebarOpen(false)
+              }}
             >
-              <LogOut className="mr-2 h-4 w-4" />
-              <span className="text-sm">Sign Out</span>
+              <LayoutDashboard className="mr-2 h-4 w-4" />
+              <span className="text-sm">Dashboard</span>
             </Button>
-          </div>
+            <Button
+              variant={currentPage === "appointments" ? "default" : "ghost"}
+              className="w-full justify-start h-9 px-3"
+              onClick={() => {
+                setCurrentPage("appointments")
+                setSidebarOpen(false)
+              }}
+            >
+              <Calendar className="mr-2 h-4 w-4" />
+              <span className="text-sm">Appointments</span>
+            </Button>
+            <Button
+              variant={currentPage === "barbers" ? "default" : "ghost"}
+              className="w-full justify-start h-9 px-3"
+              onClick={() => {
+                setCurrentPage("barbers")
+                setSidebarOpen(false)
+              }}
+            >
+              <Users className="mr-2 h-4 w-4" />
+              <span className="text-sm">Barbers</span>
+            </Button>
+            <Button
+              variant={currentPage === "branch" ? "default" : "ghost"}
+              className="w-full justify-start h-9 px-3"
+              onClick={() => {
+                setCurrentPage("branch")
+                setSidebarOpen(false)
+              }}
+            >
+              <Package className="mr-2 h-4 w-4" />
+              <span className="text-sm">Branch</span>
+            </Button>
+            <Button
+              variant={currentPage === "clients" ? "default" : "ghost"}
+              className="w-full justify-start h-9 px-3"
+              onClick={() => {
+                setCurrentPage("clients")
+                setSidebarOpen(false)
+              }}
+            >
+              <User className="mr-2 h-4 w-4" />
+              <span className="text-sm">Clients</span>
+            </Button>
+            <Button
+              variant={currentPage === "services" ? "default" : "ghost"}
+              className="w-full justify-start h-9 px-3"
+              onClick={() => {
+                setCurrentPage("services")
+                setSidebarOpen(false)
+              }}
+            >
+              <Package className="mr-2 h-4 w-4" />
+              <span className="text-sm">Services</span>
+            </Button>
+            <Button
+              variant={currentPage === "reports" ? "default" : "ghost"}
+              className="w-full justify-start h-9 px-3"
+              onClick={() => {
+                setCurrentPage("reports")
+                setSidebarOpen(false)
+              }}
+            >
+              <BarChart3 className="mr-2 h-4 w-4" />
+              <span className="text-sm">Reports</span>
+            </Button>
+            <Button
+              variant={currentPage === "settings" ? "default" : "ghost"}
+              className="w-full justify-start h-9 px-3"
+              onClick={() => {
+                setCurrentPage("settings")
+                setSidebarOpen(false)
+              }}
+            >
+              <Settings className="mr-2 h-4 w-4" />
+              <span className="text-sm">Settings</span>
+            </Button>
+          </nav>
         </SheetContent>
       </Sheet>
 
       {/* Main content */}
       <div className="flex-1">
-        <header className="sticky top-0 z-30 flex h-14 items-center border-b bg-background px-3 md:px-4">
-          <Button variant="ghost" size="icon" className="md:hidden mr-2 h-8 w-8" onClick={() => setSidebarOpen(true)}>
-            <Menu className="h-5 w-5" />
-            <span className="sr-only">Toggle Menu</span>
-          </Button>
-          <h1 className="text-base md:text-lg font-semibold">Admin Dashboard</h1>
-          <div className="ml-auto flex items-center gap-2 md:gap-4">
-            <Select defaultValue="all">
-              <SelectTrigger className="w-[140px] md:w-[180px] h-8">
-                <SelectValue placeholder="Select period" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Time</SelectItem>
-                <SelectItem value="today">Today</SelectItem>
-                <SelectItem value="week">This Week</SelectItem>
-                <SelectItem value="month">This Month</SelectItem>
-                <SelectItem value="year">This Year</SelectItem>
-              </SelectContent>
-            </Select>
-            <Avatar className="h-8 w-8">
-              <AvatarImage src="/placeholder.svg?height=32&width=32&text=Admin" alt="Admin" />
-              <AvatarFallback>AD</AvatarFallback>
-            </Avatar>
-          </div>
-        </header>
-
         <main className="p-3 md:p-4 lg:p-6">
-          <div className="grid gap-4 md:gap-6">
-            <h2 className="text-xl md:text-2xl font-bold tracking-tight">Business Overview</h2>
+          {currentPage === "dashboard" && (
+            <div className="grid gap-4 md:gap-6">
+              <h2 className="text-xl md:text-2xl font-bold tracking-tight">Business Overview</h2>
 
-            <div className="grid gap-3 md:gap-4 grid-cols-2 lg:grid-cols-4">
-              <Card className="p-3 md:p-4">
-                <CardHeader className="flex flex-row items-center justify-between pb-2 p-0">
-                  <CardTitle className="text-xs md:text-sm font-medium">Total Revenue</CardTitle>
-                  <DollarSign className="h-3 w-3 md:h-4 md:w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent className="p-0 pt-2">
-                  <div className="text-lg md:text-2xl font-bold">${totalRevenue}</div>
-                  <p className="text-xs text-muted-foreground">+12% from last month</p>
-                </CardContent>
-              </Card>
-              <Card className="p-3 md:p-4">
-                <CardHeader className="flex flex-row items-center justify-between pb-2 p-0">
-                  <CardTitle className="text-xs md:text-sm font-medium">Appointments</CardTitle>
-                  <Calendar className="h-3 w-3 md:h-4 md:w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent className="p-0 pt-2">
-                  <div className="text-lg md:text-2xl font-bold">{totalAppointments}</div>
-                  <p className="text-xs text-muted-foreground">+8% from last month</p>
-                </CardContent>
-              </Card>
-              <Card className="p-3 md:p-4">
-                <CardHeader className="flex flex-row items-center justify-between pb-2 p-0">
-                  <CardTitle className="text-xs md:text-sm font-medium">Active Barbers</CardTitle>
-                  <Users className="h-3 w-3 md:h-4 md:w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent className="p-0 pt-2">
-                  <div className="text-lg md:text-2xl font-bold">{barbers.length}</div>
-                  <p className="text-xs text-muted-foreground">All barbers active</p>
-                </CardContent>
-              </Card>
-              <Card className="p-3 md:p-4">
-                <CardHeader className="flex flex-row items-center justify-between pb-2 p-0">
-                  <CardTitle className="text-xs md:text-sm font-medium">Services Offered</CardTitle>
-                  <Package className="h-3 w-3 md:h-4 md:w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent className="p-0 pt-2">
-                  <div className="text-lg md:text-2xl font-bold">{services.length}</div>
-                  <p className="text-xs text-muted-foreground">+2 new services this month</p>
-                </CardContent>
-              </Card>
-            </div>
+              <div className="grid gap-3 md:gap-4 grid-cols-2 lg:grid-cols-4">
+                <Card className="p-3 md:p-4">
+                  <CardHeader className="flex flex-row items-center justify-between pb-2 p-0">
+                    <CardTitle className="text-xs md:text-sm font-medium">Total Revenue</CardTitle>
+                    <DollarSign className="h-3 w-3 md:h-4 md:w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent className="p-0 pt-2">
+                    <div className="text-lg md:text-2xl font-bold">${totalRevenue}</div>
+                    <p className="text-xs text-muted-foreground">+12% from last month</p>
+                  </CardContent>
+                </Card>
+                <Card className="p-3 md:p-4">
+                  <CardHeader className="flex flex-row items-center justify-between pb-2 p-0">
+                    <CardTitle className="text-xs md:text-sm font-medium">Appointments</CardTitle>
+                    <Calendar className="h-3 w-3 md:h-4 md:w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent className="p-0 pt-2">
+                    <div className="text-lg md:text-2xl font-bold">{totalAppointments}</div>
+                    <p className="text-xs text-muted-foreground">+8% from last month</p>
+                  </CardContent>
+                </Card>
+                <Card className="p-3 md:p-4">
+                  <CardHeader className="flex flex-row items-center justify-between pb-2 p-0">
+                    <CardTitle className="text-xs md:text-sm font-medium">Active Barbers</CardTitle>
+                    <Users className="h-3 w-3 md:h-4 md:w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent className="p-0 pt-2">
+                    <div className="text-lg md:text-2xl font-bold">{barbers.length}</div>
+                    <p className="text-xs text-muted-foreground">All barbers active</p>
+                  </CardContent>
+                </Card>
+                <Card className="p-3 md:p-4">
+                  <CardHeader className="flex flex-row items-center justify-between pb-2 p-0">
+                    <CardTitle className="text-xs md:text-sm font-medium">Services Offered</CardTitle>
+                    <Package className="h-3 w-3 md:h-4 md:w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent className="p-0 pt-2">
+                    <div className="text-lg md:text-2xl font-bold">{services.length}</div>
+                    <p className="text-xs text-muted-foreground">+2 new services this month</p>
+                  </CardContent>
+                </Card>
+              </div>
 
-            <div className="grid gap-4 md:gap-6 lg:grid-cols-7">
-              <Card className="lg:col-span-4">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-base md:text-lg">Revenue Overview</CardTitle>
-                  <CardDescription className="text-xs md:text-sm">Monthly revenue for the current year</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-[200px] md:h-[300px] w-full">
-                    <div className="flex h-full w-full flex-col items-center justify-center rounded-lg border border-dashed">
-                      <LineChart className="h-8 w-8 md:h-10 md:w-10 text-muted-foreground" />
-                      <h3 className="mt-2 md:mt-4 text-sm md:text-lg font-medium">Revenue Chart</h3>
-                      <p className="text-xs md:text-sm text-muted-foreground text-center px-4">
-                        Monthly revenue data visualization would appear here
-                      </p>
+              <div className="grid gap-4 md:gap-6 lg:grid-cols-7">
+                <Card className="lg:col-span-4">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-base md:text-lg">Revenue Overview</CardTitle>
+                    <CardDescription className="text-xs md:text-sm">
+                      Monthly revenue for the current year
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="h-[200px] md:h-[300px] w-full">
+                      <div className="flex h-full w-full flex-col items-center justify-center rounded-lg border border-dashed">
+                        <LineChart className="h-8 w-8 md:h-10 md:w-10 text-muted-foreground" />
+                        <h3 className="mt-2 md:mt-4 text-sm md:text-lg font-medium">Revenue Chart</h3>
+                        <p className="text-xs md:text-sm text-muted-foreground text-center px-4">
+                          Monthly revenue data visualization would appear here
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-              <Card className="lg:col-span-3">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-base md:text-lg">Top Barbers</CardTitle>
-                  <CardDescription className="text-xs md:text-sm">Barbers ranked by revenue</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {barbers
-                      .sort((a, b) => b.revenue - a.revenue)
-                      .map((barber) => (
-                        <div key={barber.id} className="flex items-center gap-3">
-                          <Avatar className="h-8 w-8 md:h-10 md:w-10">
-                            <AvatarImage
-                              src={`/placeholder.svg?height=40&width=40&text=${barber.name
-                                .split(" ")
-                                .map((n) => n[0])
-                                .join("")}`}
-                              alt={barber.name}
-                            />
-                            <AvatarFallback className="text-xs">
-                              {barber.name
-                                .split(" ")
-                                .map((n) => n[0])
-                                .join("")}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div className="flex-1 min-w-0">
-                            <h3 className="font-medium text-sm md:text-base truncate">{barber.name}</h3>
-                            <p className="text-xs text-muted-foreground truncate">{barber.specialty}</p>
+                  </CardContent>
+                </Card>
+                <Card className="lg:col-span-3">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-base md:text-lg">Top Barbers</CardTitle>
+                    <CardDescription className="text-xs md:text-sm">Barbers ranked by revenue</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      {barbers
+                        .sort((a, b) => b.revenue - a.revenue)
+                        .map((barber) => (
+                          <div key={barber.id} className="flex items-center gap-3">
+                            <Avatar className="h-8 w-8 md:h-10 md:w-10">
+                              <AvatarImage
+                                src={`/placeholder.svg?height=40&width=40&text=${barber.name
+                                  .split(" ")
+                                  .map((n) => n[0])
+                                  .join("")}`}
+                                alt={barber.name}
+                              />
+                              <AvatarFallback className="text-xs">
+                                {barber.name
+                                  .split(" ")
+                                  .map((n) => n[0])
+                                  .join("")}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className="flex-1 min-w-0">
+                              <h3 className="font-medium text-sm md:text-base truncate">{barber.name}</h3>
+                              <p className="text-xs text-muted-foreground truncate">{barber.specialty}</p>
+                            </div>
+                            <div className="text-right">
+                              <p className="font-medium text-sm md:text-base">${barber.revenue}</p>
+                              <p className="text-xs text-muted-foreground">{barber.appointments} appts</p>
+                            </div>
                           </div>
-                          <div className="text-right">
-                            <p className="font-medium text-sm md:text-base">${barber.revenue}</p>
-                            <p className="text-xs text-muted-foreground">{barber.appointments} appts</p>
-                          </div>
-                        </div>
-                      ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+                        ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
 
-            <div className="grid gap-4 md:gap-6 lg:grid-cols-2">
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-base md:text-lg">Popular Services</CardTitle>
-                  <CardDescription className="text-xs md:text-sm">
-                    Services ranked by number of bookings
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="p-0">
-                  <div className="overflow-x-auto">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead className="text-xs">Service</TableHead>
-                          <TableHead className="text-xs">Price</TableHead>
-                          <TableHead className="text-xs hidden sm:table-cell">Duration</TableHead>
-                          <TableHead className="text-xs text-right">Bookings</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {services
-                          .sort((a, b) => b.bookings - a.bookings)
-                          .slice(0, 5)
-                          .map((service) => (
-                            <TableRow key={service.id}>
-                              <TableCell className="font-medium text-xs md:text-sm">{service.name}</TableCell>
-                              <TableCell className="text-xs md:text-sm">${service.price}</TableCell>
+              <div className="grid gap-4 md:gap-6 lg:grid-cols-2">
+                <Card>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-base md:text-lg">Popular Services</CardTitle>
+                    <CardDescription className="text-xs md:text-sm">
+                      Services ranked by number of bookings
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="p-0">
+                    <div className="overflow-x-auto">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead className="text-xs">Service</TableHead>
+                            <TableHead className="text-xs">Price</TableHead>
+                            <TableHead className="text-xs hidden sm:table-cell">Duration</TableHead>
+                            <TableHead className="text-xs text-right">Bookings</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {services
+                            .sort((a, b) => b.bookings - a.bookings)
+                            .slice(0, 5)
+                            .map((service) => (
+                              <TableRow key={service.id}>
+                                <TableCell className="font-medium text-xs md:text-sm">{service.name}</TableCell>
+                                <TableCell className="text-xs md:text-sm">${service.price}</TableCell>
+                                <TableCell className="text-xs md:text-sm hidden sm:table-cell">
+                                  {service.duration} min
+                                </TableCell>
+                                <TableCell className="text-xs md:text-sm text-right">{service.bookings}</TableCell>
+                              </TableRow>
+                            ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  </CardContent>
+                  <CardFooter className="pt-3">
+                    <Button variant="outline" className="w-full h-8 text-xs">
+                      View All Services
+                    </Button>
+                  </CardFooter>
+                </Card>
+
+                <Card>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-base md:text-lg">Recent Appointments</CardTitle>
+                    <CardDescription className="text-xs md:text-sm">
+                      Latest appointments across all barbers
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="p-0">
+                    <div className="overflow-x-auto">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead className="text-xs">Client</TableHead>
+                            <TableHead className="text-xs hidden sm:table-cell">Service</TableHead>
+                            <TableHead className="text-xs hidden md:table-cell">Barber</TableHead>
+                            <TableHead className="text-xs text-right">Status</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {recentAppointments.slice(0, 5).map((appointment) => (
+                            <TableRow key={appointment.id}>
+                              <TableCell className="font-medium text-xs md:text-sm">{appointment.client}</TableCell>
                               <TableCell className="text-xs md:text-sm hidden sm:table-cell">
-                                {service.duration} min
+                                {appointment.service}
                               </TableCell>
-                              <TableCell className="text-xs md:text-sm text-right">{service.bookings}</TableCell>
+                              <TableCell className="text-xs md:text-sm hidden md:table-cell">
+                                {appointment.barber}
+                              </TableCell>
+                              <TableCell className="text-right">
+                                <Badge
+                                  variant="outline"
+                                  className={`text-xs ${
+                                    appointment.status === "completed"
+                                      ? "bg-green-500 hover:bg-green-600 text-white"
+                                      : "bg-blue-500 hover:bg-blue-600 text-white"
+                                  }`}
+                                >
+                                  {appointment.status}
+                                </Badge>
+                              </TableCell>
                             </TableRow>
                           ))}
-                      </TableBody>
-                    </Table>
-                  </div>
-                </CardContent>
-                <CardFooter className="pt-3">
-                  <Button variant="outline" className="w-full h-8 text-xs">
-                    View All Services
-                  </Button>
-                </CardFooter>
-              </Card>
+                        </TableBody>
+                      </Table>
+                    </div>
+                  </CardContent>
+                  <CardFooter className="pt-3">
+                    <Button variant="outline" className="w-full h-8 text-xs">
+                      View All Appointments
+                    </Button>
+                  </CardFooter>
+                </Card>
+              </div>
 
               <Card>
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-base md:text-lg">Recent Appointments</CardTitle>
-                  <CardDescription className="text-xs md:text-sm">
-                    Latest appointments across all barbers
-                  </CardDescription>
+                  <CardTitle className="text-base md:text-lg">Quick Actions</CardTitle>
+                  <CardDescription className="text-xs md:text-sm">Common administrative tasks</CardDescription>
                 </CardHeader>
-                <CardContent className="p-0">
-                  <div className="overflow-x-auto">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead className="text-xs">Client</TableHead>
-                          <TableHead className="text-xs hidden sm:table-cell">Service</TableHead>
-                          <TableHead className="text-xs hidden md:table-cell">Barber</TableHead>
-                          <TableHead className="text-xs text-right">Status</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {recentAppointments.slice(0, 5).map((appointment) => (
-                          <TableRow key={appointment.id}>
-                            <TableCell className="font-medium text-xs md:text-sm">{appointment.client}</TableCell>
-                            <TableCell className="text-xs md:text-sm hidden sm:table-cell">
-                              {appointment.service}
-                            </TableCell>
-                            <TableCell className="text-xs md:text-sm hidden md:table-cell">
-                              {appointment.barber}
-                            </TableCell>
-                            <TableCell className="text-right">
-                              <Badge
-                                variant="outline"
-                                className={`text-xs ${
-                                  appointment.status === "completed"
-                                    ? "bg-green-500 hover:bg-green-600 text-white"
-                                    : "bg-blue-500 hover:bg-blue-600 text-white"
-                                }`}
-                              >
-                                {appointment.status}
-                              </Badge>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
+                <CardContent>
+                  <div className="grid grid-cols-2 gap-3 md:gap-4 lg:grid-cols-4">
+                    <Button className="h-auto flex-col py-3 md:py-4">
+                      <Calendar className="mb-1 md:mb-2 h-4 w-4 md:h-5 md:w-5" />
+                      <span className="text-xs md:text-sm">New Appointment</span>
+                    </Button>
+                    <Button className="h-auto flex-col py-3 md:py-4" variant="outline">
+                      <User className="mb-1 md:mb-2 h-4 w-4 md:h-5 md:w-5" />
+                      <span className="text-xs md:text-sm">Add Client</span>
+                    </Button>
+                    <Button className="h-auto flex-col py-3 md:py-4" variant="outline">
+                      <Users className="mb-1 md:mb-2 h-4 w-4 md:h-5 md:w-5" />
+                      <span className="text-xs md:text-sm">Manage Barbers</span>
+                    </Button>
+                    <Button className="h-auto flex-col py-3 md:py-4" variant="outline">
+                      <BarChart3 className="mb-1 md:mb-2 h-4 w-4 md:h-5 md:w-5" />
+                      <span className="text-xs md:text-sm">Generate Report</span>
+                    </Button>
                   </div>
                 </CardContent>
-                <CardFooter className="pt-3">
-                  <Button variant="outline" className="w-full h-8 text-xs">
-                    View All Appointments
-                  </Button>
-                </CardFooter>
               </Card>
             </div>
-
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base md:text-lg">Quick Actions</CardTitle>
-                <CardDescription className="text-xs md:text-sm">Common administrative tasks</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 gap-3 md:gap-4 lg:grid-cols-4">
-                  <Button className="h-auto flex-col py-3 md:py-4">
-                    <Calendar className="mb-1 md:mb-2 h-4 w-4 md:h-5 md:w-5" />
-                    <span className="text-xs md:text-sm">New Appointment</span>
-                  </Button>
-                  <Button className="h-auto flex-col py-3 md:py-4" variant="outline">
-                    <User className="mb-1 md:mb-2 h-4 w-4 md:h-5 md:w-5" />
-                    <span className="text-xs md:text-sm">Add Client</span>
-                  </Button>
-                  <Button className="h-auto flex-col py-3 md:py-4" variant="outline">
-                    <Users className="mb-1 md:mb-2 h-4 w-4 md:h-5 md:w-5" />
-                    <span className="text-xs md:text-sm">Manage Barbers</span>
-                  </Button>
-                  <Button className="h-auto flex-col py-3 md:py-4" variant="outline">
-                    <BarChart3 className="mb-1 md:mb-2 h-4 w-4 md:h-5 md:w-5" />
-                    <span className="text-xs md:text-sm">Generate Report</span>
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+          )}
+          {currentPage === "appointments" && <AppointmentsPage />}
+          {currentPage === "barbers" && <BarbersPage />}
+          {currentPage === "branch" && <BranchPage />}
+          {currentPage === "clients" && <ClientsPage />}
+          {currentPage === "services" && <ServicesPage />}
+          {currentPage === "reports" && <ReportsPage />}
+          {currentPage === "settings" && <SettingsPage />}
         </main>
       </div>
     </div>
