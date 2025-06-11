@@ -161,22 +161,6 @@ const recentAppointments = [
   },
 ]
 
-// Monthly revenue data for chart
-const monthlyRevenue = [
-  { month: "Jan", revenue: 2200 },
-  { month: "Feb", revenue: 2400 },
-  { month: "Mar", revenue: 2600 },
-  { month: "Apr", revenue: 2800 },
-  { month: "May", revenue: 3200 },
-  { month: "Jun", revenue: 3400 },
-  { month: "Jul", revenue: 3600 },
-  { month: "Aug", revenue: 3800 },
-  { month: "Sep", revenue: 3600 },
-  { month: "Oct", revenue: 3400 },
-  { month: "Nov", revenue: 3200 },
-  { month: "Dec", revenue: 3000 },
-]
-
 export default function AdminDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
@@ -189,158 +173,164 @@ export default function AdminDashboard() {
   return (
     <div className="flex min-h-screen bg-muted/40">
       {/* Sidebar for larger screens */}
-      <aside className="hidden w-64 flex-col border-r bg-background p-6 md:flex">
-        <div className="flex items-center gap-2 mb-8">
+      <aside className="hidden w-56 flex-col border-r bg-background p-4 md:flex">
+        <div className="flex items-center gap-2 mb-6">
           <div className="rounded-full bg-primary/10 p-1">
-            <Scissors className="h-6 w-6 text-primary" />
+            <Scissors className="h-5 w-5 text-primary" />
           </div>
-          <span className="text-xl font-bold">ClipMaster</span>
+          <span className="text-lg font-bold">ClipMaster</span>
         </div>
 
-        <div className="flex flex-col items-center mb-8">
-          <Avatar className="h-20 w-20 mb-2">
-            <AvatarImage src="/placeholder.svg?height=80&width=80&text=Admin" alt="Admin" />
+        <div className="flex flex-col items-center mb-6">
+          <Avatar className="h-16 w-16 mb-2">
+            <AvatarImage src="/placeholder.svg?height=64&width=64&text=Admin" alt="Admin" />
             <AvatarFallback>AD</AvatarFallback>
           </Avatar>
-          <h2 className="text-lg font-bold">Admin Panel</h2>
-          <p className="text-sm text-muted-foreground">Shop Manager</p>
+          <h2 className="text-base font-bold">Admin Panel</h2>
+          <p className="text-xs text-muted-foreground">Shop Manager</p>
         </div>
 
-        <nav className="flex flex-col gap-1">
+        <nav className="flex flex-col gap-1 flex-1">
           <Link href="/admin-dashboard">
-            <Button variant="ghost" className="w-full justify-start">
-              <LayoutDashboard className="mr-2 h-5 w-5" />
-              Dashboard
+            <Button variant="ghost" className="w-full justify-start h-9 px-3">
+              <LayoutDashboard className="mr-2 h-4 w-4" />
+              <span className="text-sm">Dashboard</span>
             </Button>
           </Link>
           <Link href="/admin-dashboard/appointments">
-            <Button variant="ghost" className="w-full justify-start">
-              <Calendar className="mr-2 h-5 w-5" />
-              Appointments
+            <Button variant="ghost" className="w-full justify-start h-9 px-3">
+              <Calendar className="mr-2 h-4 w-4" />
+              <span className="text-sm">Appointments</span>
             </Button>
           </Link>
           <Link href="/admin-dashboard/barbers">
-            <Button variant="ghost" className="w-full justify-start">
-              <Users className="mr-2 h-5 w-5" />
-              Barbers
+            <Button variant="ghost" className="w-full justify-start h-9 px-3">
+              <Users className="mr-2 h-4 w-4" />
+              <span className="text-sm">Barbers</span>
             </Button>
           </Link>
           <Link href="/admin-dashboard/clients">
-            <Button variant="ghost" className="w-full justify-start">
-              <User className="mr-2 h-5 w-5" />
-              Clients
+            <Button variant="ghost" className="w-full justify-start h-9 px-3">
+              <User className="mr-2 h-4 w-4" />
+              <span className="text-sm">Clients</span>
             </Button>
           </Link>
           <Link href="/admin-dashboard/services">
-            <Button variant="ghost" className="w-full justify-start">
-              <Package className="mr-2 h-5 w-5" />
-              Services
+            <Button variant="ghost" className="w-full justify-start h-9 px-3">
+              <Package className="mr-2 h-4 w-4" />
+              <span className="text-sm">Services</span>
             </Button>
           </Link>
           <Link href="/admin-dashboard/reports">
-            <Button variant="ghost" className="w-full justify-start">
-              <BarChart3 className="mr-2 h-5 w-5" />
-              Reports
+            <Button variant="ghost" className="w-full justify-start h-9 px-3">
+              <BarChart3 className="mr-2 h-4 w-4" />
+              <span className="text-sm">Reports</span>
             </Button>
           </Link>
           <Link href="/admin-dashboard/settings">
-            <Button variant="ghost" className="w-full justify-start">
-              <Settings className="mr-2 h-5 w-5" />
-              Settings
+            <Button variant="ghost" className="w-full justify-start h-9 px-3">
+              <Settings className="mr-2 h-4 w-4" />
+              <span className="text-sm">Settings</span>
             </Button>
           </Link>
         </nav>
 
-        <div className="mt-auto">
-          <Separator className="my-4" />
+        <div className="mt-auto pt-4">
+          <Separator className="my-3" />
           <Link href="/">
-            <Button variant="ghost" className="w-full justify-start">
-              <Home className="mr-2 h-5 w-5" />
-              Main Website
+            <Button variant="ghost" className="w-full justify-start h-9 px-3">
+              <Home className="mr-2 h-4 w-4" />
+              <span className="text-sm">Main Website</span>
             </Button>
           </Link>
-          <Button variant="ghost" className="w-full justify-start text-red-500 hover:text-red-600 hover:bg-red-50">
-            <LogOut className="mr-2 h-5 w-5" />
-            Sign Out
+          <Button
+            variant="ghost"
+            className="w-full justify-start h-9 px-3 text-red-500 hover:text-red-600 hover:bg-red-50"
+          >
+            <LogOut className="mr-2 h-4 w-4" />
+            <span className="text-sm">Sign Out</span>
           </Button>
         </div>
       </aside>
 
       {/* Mobile sidebar */}
       <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
-        <SheetContent side="left" className="w-64 p-6">
-          <div className="flex items-center gap-2 mb-8">
+        <SheetContent side="left" className="w-56 p-4">
+          <div className="flex items-center gap-2 mb-6">
             <div className="rounded-full bg-primary/10 p-1">
-              <Scissors className="h-6 w-6 text-primary" />
+              <Scissors className="h-5 w-5 text-primary" />
             </div>
-            <span className="text-xl font-bold">ClipMaster</span>
+            <span className="text-lg font-bold">ClipMaster</span>
           </div>
 
-          <div className="flex flex-col items-center mb-8">
-            <Avatar className="h-20 w-20 mb-2">
-              <AvatarImage src="/placeholder.svg?height=80&width=80&text=Admin" alt="Admin" />
+          <div className="flex flex-col items-center mb-6">
+            <Avatar className="h-16 w-16 mb-2">
+              <AvatarImage src="/placeholder.svg?height=64&width=64&text=Admin" alt="Admin" />
               <AvatarFallback>AD</AvatarFallback>
             </Avatar>
-            <h2 className="text-lg font-bold">Admin Panel</h2>
-            <p className="text-sm text-muted-foreground">Shop Manager</p>
+            <h2 className="text-base font-bold">Admin Panel</h2>
+            <p className="text-xs text-muted-foreground">Shop Manager</p>
           </div>
 
-          <nav className="flex flex-col gap-1">
+          <nav className="flex flex-col gap-1 flex-1">
             <Link href="/admin-dashboard" onClick={() => setSidebarOpen(false)}>
-              <Button variant="ghost" className="w-full justify-start">
-                <LayoutDashboard className="mr-2 h-5 w-5" />
-                Dashboard
+              <Button variant="ghost" className="w-full justify-start h-9 px-3">
+                <LayoutDashboard className="mr-2 h-4 w-4" />
+                <span className="text-sm">Dashboard</span>
               </Button>
             </Link>
             <Link href="/admin-dashboard/appointments" onClick={() => setSidebarOpen(false)}>
-              <Button variant="ghost" className="w-full justify-start">
-                <Calendar className="mr-2 h-5 w-5" />
-                Appointments
+              <Button variant="ghost" className="w-full justify-start h-9 px-3">
+                <Calendar className="mr-2 h-4 w-4" />
+                <span className="text-sm">Appointments</span>
               </Button>
             </Link>
             <Link href="/admin-dashboard/barbers" onClick={() => setSidebarOpen(false)}>
-              <Button variant="ghost" className="w-full justify-start">
-                <Users className="mr-2 h-5 w-5" />
-                Barbers
+              <Button variant="ghost" className="w-full justify-start h-9 px-3">
+                <Users className="mr-2 h-4 w-4" />
+                <span className="text-sm">Barbers</span>
               </Button>
             </Link>
             <Link href="/admin-dashboard/clients" onClick={() => setSidebarOpen(false)}>
-              <Button variant="ghost" className="w-full justify-start">
-                <User className="mr-2 h-5 w-5" />
-                Clients
+              <Button variant="ghost" className="w-full justify-start h-9 px-3">
+                <User className="mr-2 h-4 w-4" />
+                <span className="text-sm">Clients</span>
               </Button>
             </Link>
             <Link href="/admin-dashboard/services" onClick={() => setSidebarOpen(false)}>
-              <Button variant="ghost" className="w-full justify-start">
-                <Package className="mr-2 h-5 w-5" />
-                Services
+              <Button variant="ghost" className="w-full justify-start h-9 px-3">
+                <Package className="mr-2 h-4 w-4" />
+                <span className="text-sm">Services</span>
               </Button>
             </Link>
             <Link href="/admin-dashboard/reports" onClick={() => setSidebarOpen(false)}>
-              <Button variant="ghost" className="w-full justify-start">
-                <BarChart3 className="mr-2 h-5 w-5" />
-                Reports
+              <Button variant="ghost" className="w-full justify-start h-9 px-3">
+                <BarChart3 className="mr-2 h-4 w-4" />
+                <span className="text-sm">Reports</span>
               </Button>
             </Link>
             <Link href="/admin-dashboard/settings" onClick={() => setSidebarOpen(false)}>
-              <Button variant="ghost" className="w-full justify-start">
-                <Settings className="mr-2 h-5 w-5" />
-                Settings
+              <Button variant="ghost" className="w-full justify-start h-9 px-3">
+                <Settings className="mr-2 h-4 w-4" />
+                <span className="text-sm">Settings</span>
               </Button>
             </Link>
           </nav>
 
-          <div className="mt-auto">
-            <Separator className="my-4" />
+          <div className="mt-auto pt-4">
+            <Separator className="my-3" />
             <Link href="/" onClick={() => setSidebarOpen(false)}>
-              <Button variant="ghost" className="w-full justify-start">
-                <Home className="mr-2 h-5 w-5" />
-                Main Website
+              <Button variant="ghost" className="w-full justify-start h-9 px-3">
+                <Home className="mr-2 h-4 w-4" />
+                <span className="text-sm">Main Website</span>
               </Button>
             </Link>
-            <Button variant="ghost" className="w-full justify-start text-red-500 hover:text-red-600 hover:bg-red-50">
-              <LogOut className="mr-2 h-5 w-5" />
-              Sign Out
+            <Button
+              variant="ghost"
+              className="w-full justify-start h-9 px-3 text-red-500 hover:text-red-600 hover:bg-red-50"
+            >
+              <LogOut className="mr-2 h-4 w-4" />
+              <span className="text-sm">Sign Out</span>
             </Button>
           </div>
         </SheetContent>
@@ -348,15 +338,15 @@ export default function AdminDashboard() {
 
       {/* Main content */}
       <div className="flex-1">
-        <header className="sticky top-0 z-30 flex h-16 items-center border-b bg-background px-4 md:px-6">
-          <Button variant="ghost" size="icon" className="md:hidden mr-2" onClick={() => setSidebarOpen(true)}>
-            <Menu className="h-6 w-6" />
+        <header className="sticky top-0 z-30 flex h-14 items-center border-b bg-background px-3 md:px-4">
+          <Button variant="ghost" size="icon" className="md:hidden mr-2 h-8 w-8" onClick={() => setSidebarOpen(true)}>
+            <Menu className="h-5 w-5" />
             <span className="sr-only">Toggle Menu</span>
           </Button>
-          <h1 className="text-lg font-semibold">Admin Dashboard</h1>
-          <div className="ml-auto flex items-center gap-4">
+          <h1 className="text-base md:text-lg font-semibold">Admin Dashboard</h1>
+          <div className="ml-auto flex items-center gap-2 md:gap-4">
             <Select defaultValue="all">
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="w-[140px] md:w-[180px] h-8">
                 <SelectValue placeholder="Select period" />
               </SelectTrigger>
               <SelectContent>
@@ -367,73 +357,72 @@ export default function AdminDashboard() {
                 <SelectItem value="year">This Year</SelectItem>
               </SelectContent>
             </Select>
-            <Avatar>
+            <Avatar className="h-8 w-8">
               <AvatarImage src="/placeholder.svg?height=32&width=32&text=Admin" alt="Admin" />
               <AvatarFallback>AD</AvatarFallback>
             </Avatar>
           </div>
         </header>
 
-        <main className="p-4 md:p-6">
-          <div className="grid gap-6">
-            <h2 className="text-2xl font-bold tracking-tight">Business Overview</h2>
+        <main className="p-3 md:p-4 lg:p-6">
+          <div className="grid gap-4 md:gap-6">
+            <h2 className="text-xl md:text-2xl font-bold tracking-tight">Business Overview</h2>
 
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-                  <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <div className="grid gap-3 md:gap-4 grid-cols-2 lg:grid-cols-4">
+              <Card className="p-3 md:p-4">
+                <CardHeader className="flex flex-row items-center justify-between pb-2 p-0">
+                  <CardTitle className="text-xs md:text-sm font-medium">Total Revenue</CardTitle>
+                  <DollarSign className="h-3 w-3 md:h-4 md:w-4 text-muted-foreground" />
                 </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">${totalRevenue}</div>
+                <CardContent className="p-0 pt-2">
+                  <div className="text-lg md:text-2xl font-bold">${totalRevenue}</div>
                   <p className="text-xs text-muted-foreground">+12% from last month</p>
                 </CardContent>
               </Card>
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium">Appointments</CardTitle>
-                  <Calendar className="h-4 w-4 text-muted-foreground" />
+              <Card className="p-3 md:p-4">
+                <CardHeader className="flex flex-row items-center justify-between pb-2 p-0">
+                  <CardTitle className="text-xs md:text-sm font-medium">Appointments</CardTitle>
+                  <Calendar className="h-3 w-3 md:h-4 md:w-4 text-muted-foreground" />
                 </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{totalAppointments}</div>
+                <CardContent className="p-0 pt-2">
+                  <div className="text-lg md:text-2xl font-bold">{totalAppointments}</div>
                   <p className="text-xs text-muted-foreground">+8% from last month</p>
                 </CardContent>
               </Card>
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium">Active Barbers</CardTitle>
-                  <Users className="h-4 w-4 text-muted-foreground" />
+              <Card className="p-3 md:p-4">
+                <CardHeader className="flex flex-row items-center justify-between pb-2 p-0">
+                  <CardTitle className="text-xs md:text-sm font-medium">Active Barbers</CardTitle>
+                  <Users className="h-3 w-3 md:h-4 md:w-4 text-muted-foreground" />
                 </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{barbers.length}</div>
+                <CardContent className="p-0 pt-2">
+                  <div className="text-lg md:text-2xl font-bold">{barbers.length}</div>
                   <p className="text-xs text-muted-foreground">All barbers active</p>
                 </CardContent>
               </Card>
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium">Services Offered</CardTitle>
-                  <Package className="h-4 w-4 text-muted-foreground" />
+              <Card className="p-3 md:p-4">
+                <CardHeader className="flex flex-row items-center justify-between pb-2 p-0">
+                  <CardTitle className="text-xs md:text-sm font-medium">Services Offered</CardTitle>
+                  <Package className="h-3 w-3 md:h-4 md:w-4 text-muted-foreground" />
                 </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{services.length}</div>
+                <CardContent className="p-0 pt-2">
+                  <div className="text-lg md:text-2xl font-bold">{services.length}</div>
                   <p className="text-xs text-muted-foreground">+2 new services this month</p>
                 </CardContent>
               </Card>
             </div>
 
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
+            <div className="grid gap-4 md:gap-6 lg:grid-cols-7">
               <Card className="lg:col-span-4">
-                <CardHeader>
-                  <CardTitle>Revenue Overview</CardTitle>
-                  <CardDescription>Monthly revenue for the current year</CardDescription>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base md:text-lg">Revenue Overview</CardTitle>
+                  <CardDescription className="text-xs md:text-sm">Monthly revenue for the current year</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="h-[300px] w-full">
-                    {/* This would be a chart in a real implementation */}
+                  <div className="h-[200px] md:h-[300px] w-full">
                     <div className="flex h-full w-full flex-col items-center justify-center rounded-lg border border-dashed">
-                      <LineChart className="h-10 w-10 text-muted-foreground" />
-                      <h3 className="mt-4 text-lg font-medium">Revenue Chart</h3>
-                      <p className="text-sm text-muted-foreground">
+                      <LineChart className="h-8 w-8 md:h-10 md:w-10 text-muted-foreground" />
+                      <h3 className="mt-2 md:mt-4 text-sm md:text-lg font-medium">Revenue Chart</h3>
+                      <p className="text-xs md:text-sm text-muted-foreground text-center px-4">
                         Monthly revenue data visualization would appear here
                       </p>
                     </div>
@@ -441,17 +430,17 @@ export default function AdminDashboard() {
                 </CardContent>
               </Card>
               <Card className="lg:col-span-3">
-                <CardHeader>
-                  <CardTitle>Top Barbers</CardTitle>
-                  <CardDescription>Barbers ranked by revenue</CardDescription>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base md:text-lg">Top Barbers</CardTitle>
+                  <CardDescription className="text-xs md:text-sm">Barbers ranked by revenue</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-4">
+                  <div className="space-y-3">
                     {barbers
                       .sort((a, b) => b.revenue - a.revenue)
                       .map((barber) => (
-                        <div key={barber.id} className="flex items-center gap-4">
-                          <Avatar>
+                        <div key={barber.id} className="flex items-center gap-3">
+                          <Avatar className="h-8 w-8 md:h-10 md:w-10">
                             <AvatarImage
                               src={`/placeholder.svg?height=40&width=40&text=${barber.name
                                 .split(" ")
@@ -459,20 +448,20 @@ export default function AdminDashboard() {
                                 .join("")}`}
                               alt={barber.name}
                             />
-                            <AvatarFallback>
+                            <AvatarFallback className="text-xs">
                               {barber.name
                                 .split(" ")
                                 .map((n) => n[0])
                                 .join("")}
                             </AvatarFallback>
                           </Avatar>
-                          <div className="flex-1">
-                            <h3 className="font-medium">{barber.name}</h3>
-                            <p className="text-sm text-muted-foreground">{barber.specialty}</p>
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-medium text-sm md:text-base truncate">{barber.name}</h3>
+                            <p className="text-xs text-muted-foreground truncate">{barber.specialty}</p>
                           </div>
                           <div className="text-right">
-                            <p className="font-medium">${barber.revenue}</p>
-                            <p className="text-sm text-muted-foreground">{barber.appointments} appts</p>
+                            <p className="font-medium text-sm md:text-base">${barber.revenue}</p>
+                            <p className="text-xs text-muted-foreground">{barber.appointments} appts</p>
                           </div>
                         </div>
                       ))}
@@ -481,84 +470,98 @@ export default function AdminDashboard() {
               </Card>
             </div>
 
-            <div className="grid gap-6 md:grid-cols-2">
+            <div className="grid gap-4 md:gap-6 lg:grid-cols-2">
               <Card>
-                <CardHeader>
-                  <CardTitle>Popular Services</CardTitle>
-                  <CardDescription>Services ranked by number of bookings</CardDescription>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base md:text-lg">Popular Services</CardTitle>
+                  <CardDescription className="text-xs md:text-sm">
+                    Services ranked by number of bookings
+                  </CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Service</TableHead>
-                        <TableHead>Price</TableHead>
-                        <TableHead>Duration</TableHead>
-                        <TableHead className="text-right">Bookings</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {services
-                        .sort((a, b) => b.bookings - a.bookings)
-                        .slice(0, 5)
-                        .map((service) => (
-                          <TableRow key={service.id}>
-                            <TableCell className="font-medium">{service.name}</TableCell>
-                            <TableCell>${service.price}</TableCell>
-                            <TableCell>{service.duration} min</TableCell>
-                            <TableCell className="text-right">{service.bookings}</TableCell>
-                          </TableRow>
-                        ))}
-                    </TableBody>
-                  </Table>
+                <CardContent className="p-0">
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="text-xs">Service</TableHead>
+                          <TableHead className="text-xs">Price</TableHead>
+                          <TableHead className="text-xs hidden sm:table-cell">Duration</TableHead>
+                          <TableHead className="text-xs text-right">Bookings</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {services
+                          .sort((a, b) => b.bookings - a.bookings)
+                          .slice(0, 5)
+                          .map((service) => (
+                            <TableRow key={service.id}>
+                              <TableCell className="font-medium text-xs md:text-sm">{service.name}</TableCell>
+                              <TableCell className="text-xs md:text-sm">${service.price}</TableCell>
+                              <TableCell className="text-xs md:text-sm hidden sm:table-cell">
+                                {service.duration} min
+                              </TableCell>
+                              <TableCell className="text-xs md:text-sm text-right">{service.bookings}</TableCell>
+                            </TableRow>
+                          ))}
+                      </TableBody>
+                    </Table>
+                  </div>
                 </CardContent>
-                <CardFooter>
-                  <Button variant="outline" className="w-full">
+                <CardFooter className="pt-3">
+                  <Button variant="outline" className="w-full h-8 text-xs">
                     View All Services
                   </Button>
                 </CardFooter>
               </Card>
 
               <Card>
-                <CardHeader>
-                  <CardTitle>Recent Appointments</CardTitle>
-                  <CardDescription>Latest appointments across all barbers</CardDescription>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base md:text-lg">Recent Appointments</CardTitle>
+                  <CardDescription className="text-xs md:text-sm">
+                    Latest appointments across all barbers
+                  </CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Client</TableHead>
-                        <TableHead>Service</TableHead>
-                        <TableHead>Barber</TableHead>
-                        <TableHead className="text-right">Status</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {recentAppointments.slice(0, 5).map((appointment) => (
-                        <TableRow key={appointment.id}>
-                          <TableCell className="font-medium">{appointment.client}</TableCell>
-                          <TableCell>{appointment.service}</TableCell>
-                          <TableCell>{appointment.barber}</TableCell>
-                          <TableCell className="text-right">
-                            <Badge
-                              variant="outline"
-                              className={
-                                appointment.status === "completed"
-                                  ? "bg-green-500 hover:bg-green-600 text-white"
-                                  : "bg-blue-500 hover:bg-blue-600 text-white"
-                              }
-                            >
-                              {appointment.status}
-                            </Badge>
-                          </TableCell>
+                <CardContent className="p-0">
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="text-xs">Client</TableHead>
+                          <TableHead className="text-xs hidden sm:table-cell">Service</TableHead>
+                          <TableHead className="text-xs hidden md:table-cell">Barber</TableHead>
+                          <TableHead className="text-xs text-right">Status</TableHead>
                         </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
+                      </TableHeader>
+                      <TableBody>
+                        {recentAppointments.slice(0, 5).map((appointment) => (
+                          <TableRow key={appointment.id}>
+                            <TableCell className="font-medium text-xs md:text-sm">{appointment.client}</TableCell>
+                            <TableCell className="text-xs md:text-sm hidden sm:table-cell">
+                              {appointment.service}
+                            </TableCell>
+                            <TableCell className="text-xs md:text-sm hidden md:table-cell">
+                              {appointment.barber}
+                            </TableCell>
+                            <TableCell className="text-right">
+                              <Badge
+                                variant="outline"
+                                className={`text-xs ${
+                                  appointment.status === "completed"
+                                    ? "bg-green-500 hover:bg-green-600 text-white"
+                                    : "bg-blue-500 hover:bg-blue-600 text-white"
+                                }`}
+                              >
+                                {appointment.status}
+                              </Badge>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
                 </CardContent>
-                <CardFooter>
-                  <Button variant="outline" className="w-full">
+                <CardFooter className="pt-3">
+                  <Button variant="outline" className="w-full h-8 text-xs">
                     View All Appointments
                   </Button>
                 </CardFooter>
@@ -566,27 +569,27 @@ export default function AdminDashboard() {
             </div>
 
             <Card>
-              <CardHeader>
-                <CardTitle>Quick Actions</CardTitle>
-                <CardDescription>Common administrative tasks</CardDescription>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base md:text-lg">Quick Actions</CardTitle>
+                <CardDescription className="text-xs md:text-sm">Common administrative tasks</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-                  <Button className="h-auto flex-col py-4">
-                    <Calendar className="mb-2 h-5 w-5" />
-                    <span>New Appointment</span>
+                <div className="grid grid-cols-2 gap-3 md:gap-4 lg:grid-cols-4">
+                  <Button className="h-auto flex-col py-3 md:py-4">
+                    <Calendar className="mb-1 md:mb-2 h-4 w-4 md:h-5 md:w-5" />
+                    <span className="text-xs md:text-sm">New Appointment</span>
                   </Button>
-                  <Button className="h-auto flex-col py-4" variant="outline">
-                    <User className="mb-2 h-5 w-5" />
-                    <span>Add Client</span>
+                  <Button className="h-auto flex-col py-3 md:py-4" variant="outline">
+                    <User className="mb-1 md:mb-2 h-4 w-4 md:h-5 md:w-5" />
+                    <span className="text-xs md:text-sm">Add Client</span>
                   </Button>
-                  <Button className="h-auto flex-col py-4" variant="outline">
-                    <Users className="mb-2 h-5 w-5" />
-                    <span>Manage Barbers</span>
+                  <Button className="h-auto flex-col py-3 md:py-4" variant="outline">
+                    <Users className="mb-1 md:mb-2 h-4 w-4 md:h-5 md:w-5" />
+                    <span className="text-xs md:text-sm">Manage Barbers</span>
                   </Button>
-                  <Button className="h-auto flex-col py-4" variant="outline">
-                    <BarChart3 className="mb-2 h-5 w-5" />
-                    <span>Generate Report</span>
+                  <Button className="h-auto flex-col py-3 md:py-4" variant="outline">
+                    <BarChart3 className="mb-1 md:mb-2 h-4 w-4 md:h-5 md:w-5" />
+                    <span className="text-xs md:text-sm">Generate Report</span>
                   </Button>
                 </div>
               </CardContent>

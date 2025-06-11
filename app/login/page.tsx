@@ -18,57 +18,71 @@ export default function LoginPage() {
   const [error, setError] = useState("")
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    setIsLoading(true)
-    setError("")
+  e.preventDefault()
+  setIsLoading(true)
+  setError("")
 
-    try {
-      const response = await fetch("https://be-collins.vercel.app/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email,
-          password,
-        }),
-      })
+  try {
+    const response = await fetch("http://localhost:5000/api/auth/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email,
+        password,
+      }),
+    })
 
-      const data = await response.json()
+    const data = await response.json()
 
-      if (!response.ok) {
-        throw new Error(data.message || "Login failed")
-      }
-
-      if (data.success) {
-        // Simpan token dan user data ke localStorage
-        localStorage.setItem("token", data.data.token)
-        localStorage.setItem("userId", data.data.user.id)
-        localStorage.setItem("userData", JSON.stringify(data.data.user))
-        
-        // Beri jeda sebelum redirect untuk memastikan data tersimpan
-        setTimeout(() => {
-          // Redirect berdasarkan role_id
-          switch (data.data.user.role_id) {
-            case 1:
-              window.location.href = "/admin-dashboard" // Gunakan full page reload
-              break
-            case 2:
-              window.location.href = "/barber-dashboard"
-              break
-            case 3:
-              window.location.href = "/dashboard"
-              break
-            default:
-              window.location.href = "/dashboard"
-          }
-        }, 100)
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "An unknown error occurred")
-      setIsLoading(false)
+    if (!response.ok) {
+      throw new Error(data.message || "Login failed")
     }
+
+    if (data.success) {
+      // Debug: Log data untuk memastikan struktur response
+      console.log("Login response:", data)
+      console.log("User role_id:", data.data.user.role_id)
+      
+      // Simpan token dan user data ke localStorage
+      localStorage.setItem("token", data.data.token)
+      localStorage.setItem("userId", data.data.user.id)
+      localStorage.setItem("userData", JSON.stringify(data.data.user))
+      
+      // Tentukan redirect URL berdasarkan role_id
+      let redirectUrl = "/dashboard" // default
+      
+      switch (data.data.user.role_id) {
+        case 1:
+          redirectUrl = "/admin-dashboard"
+          break
+        case 2:
+          redirectUrl = "/barber-dashboard"
+          break
+        case 3:
+          redirectUrl = "/dashboard"
+          break
+        default:
+          redirectUrl = "/dashboard"
+      }
+      
+      console.log("Redirecting to:", redirectUrl)
+      
+      // Gunakan router.push untuk redirect yang lebih reliable
+      router.push(redirectUrl)
+      
+      // Alternatif: Jika masih menggunakan window.location, tambahkan delay
+      // setTimeout(() => {
+      //   window.location.href = redirectUrl
+      // }, 200)
+      
+    }
+  } catch (err) {
+    setError(err instanceof Error ? err.message : "An unknown error occurred")
+    setIsLoading(false)
   }
+}
 
   return (
     <div className="container py-12 md:py-16">
